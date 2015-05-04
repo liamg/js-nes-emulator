@@ -160,7 +160,7 @@ QUnit.module( "6502 CPU", {
     }
 });
 
-QUnit.test("6502 initialises registers", function( assert ) {
+QUnit.test("6502 initialises registers/flags", function( assert ) {
 
     assert.equal(cpu.registers.A, 0, 'Register A is initialised to 0x00');
     assert.equal(cpu.registers.X, 0, 'Register X is initialised to 0x00');
@@ -168,6 +168,10 @@ QUnit.test("6502 initialises registers", function( assert ) {
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is initialised to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is initialised to 0x07FF');
     assert.equal(cpu.registers.P, 0, 'Register P is initialised to 0x00');
+
+    assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
+    assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
+    assert.equal(cpu.flags.zero, 1, 'Zero flag is initially set');
 
 });
 
@@ -188,6 +192,10 @@ QUnit.test("6502 reset state", function( assert ) {
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is reset to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is reset to 0x07FF');
     assert.equal(cpu.registers.P, 0, 'Register P is reset to 0x00');
+
+    assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
+    assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
+    assert.equal(cpu.flags.zero, 1, 'Zero flag is initially set');
 
 });
 
@@ -630,6 +638,8 @@ QUnit.test("6502 LDA #", function( assert ) {
     assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
 
+    cpu.reset();
+
     mmc.store(0x200, 0xA9);
     mmc.store(0x201, 0x8);
     mmc.store(0x202, 0xA9);
@@ -649,8 +659,42 @@ QUnit.test("6502 LDA #", function( assert ) {
     assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
     assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDA #');
 
-    //@TODO add more assertions for LDA operations e.g. cycles etc.
 
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 1, 'LDA #0 results in zero flag being set');
+    assert.equal(cpu.flags.negative, 0, 'LDA #0 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDA #7 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 0, 'LDA #7 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x81);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDA #81 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 1, 'LDA #81 results in negative flag being set');
 
 });
 
