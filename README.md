@@ -1,7 +1,7 @@
 js-nes-emulator
 ===============
 
-[![Build Status](https://travis-ci.org/liamg/js-nes-emulator.svg?branch=master)](https://travis-ci.org/liamg/js-nes-emulator)]
+[![Build Status](https://travis-ci.org/liamg/js-nes-emulator.svg?branch=master)](https://travis-ci.org/liamg/js-nes-emulator)
 
 NES emulator implemented in JavaScript.
 
