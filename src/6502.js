@@ -86,7 +86,6 @@
         for(var i in this.addressModes){
             if(this.addressModes[i] == address_mode) return i;
         }
-        return '';
         return '0x' + address_mode.toString(16);
     };
 
@@ -354,7 +353,6 @@
                 break;
             case this.addressModes.IMPLICIT:
                 throw "Cannot read memory for an implicit addressing mode operation";
-                break;
             default:
                 throw "Unsupported addressing mode";
         }

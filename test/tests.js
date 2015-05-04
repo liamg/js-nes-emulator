@@ -515,7 +515,7 @@ QUnit.test("6502 instruction table contains valid instructions", function( asser
     
     for(var opcode in cpu.instruction_table) {
 
-        opcode = parseInt(opcode);
+        opcode = parseInt(opcode, 10);
 
         var decoded = decodeInstruction(opcode);
 
