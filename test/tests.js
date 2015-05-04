@@ -623,9 +623,7 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     assert.equal(postindex, 0x8, 'INDIRECT INDEXED address mode reads value');
 });
 
-QUnit.test("6502 LDA #", function( assert ) {
-
-    cpu.reset();
+QUnit.test("LDA #", function( assert ) {
 
     mmc.store(0x200, 0xA9);
     mmc.store(0x201, 0x07);
@@ -695,6 +693,15 @@ QUnit.test("6502 LDA #", function( assert ) {
 
     assert.equal(cpu.flags.zero, 0, 'LDA #81 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 1, 'LDA #81 results in negative flag being set');
+
+});
+
+QUnit.test("NOP", function( assert ) {
+
+    mmc.store(0x200, 0xEA);
+    cpu.registers.PC = 0x200;
+
+    assert.equal(cpu.execute(), 2, 'NOP takes 2 cycles');
 
 });
 
