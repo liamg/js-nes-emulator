@@ -529,6 +529,94 @@ QUnit.test("6502 instruction table contains valid instructions", function( asser
 });
 
 
+QUnit.test("6502 Memory reads in different address modes", function( assert ) {
+
+    cpu.registers.A = 0x9;
+    var accumulator = cpu.readMemory(cpu.addressModes.ACCUMULATOR);
+    assert.equal(accumulator, 0x9, 'ACCUMULATOR address mode reads value');
+
+    mmc.store(0xf, 0xff);
+    cpu.registers.PC = 0xf;
+    var imm = cpu.readMemory(cpu.addressModes.IMMEDIATE);
+    assert.equal(imm, 0xff, 'IMMEDIATE address mode reads value');
+
+    mmc.store(0x101, 0x3);
+    mmc.store(0x102, 0x9);
+    mmc.store(0x103, 0x8);
+    mmc.store(0x104, 0x7);
+    mmc.store(0x105, 0x6);
+    cpu.registers.PC = 0x101;
+    var rel = cpu.readMemory(cpu.addressModes.RELATIVE);
+    assert.equal(rel, 0x6, 'RELATIVE address mode reads value');
+
+    mmc.store(0xf, 0x1);
+    cpu.registers.PC = 0xf;
+    var zpval = cpu.readMemory(cpu.addressModes.ZERO_PAGE);
+    assert.equal(zpval, 0x1, 'ZERO PAGE address mode reads value');
+
+    mmc.store(0x6, 0x2);
+    cpu.registers.PC = 0x3;
+    cpu.registers.X = 0x3;
+    var zpxval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_X);
+    assert.equal(zpxval, 0x2, 'ZERO PAGE X address mode reads value');
+
+    mmc.store(0xa, 0x3);
+    cpu.registers.PC = 0x8;
+    cpu.registers.Y = 0x2;
+    var zpyval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_Y);
+    assert.equal(zpyval, 0x3, 'ZERO PAGE Y address mode reads value');
+
+    mmc.store(0x101, 0xaa);
+    mmc.store(0x102, 0xaa);
+    mmc.store(0xaaaa, 0x1);
+    cpu.registers.PC = 0x101;
+    var absval = cpu.readMemory(cpu.addressModes.ABSOLUTE);
+    assert.equal(absval, 0x1, 'ABSOLUTE address mode reads value');
+
+    mmc.store(0x101, 0x01);
+    mmc.store(0x102, 0xcc);
+    mmc.store(0xcc01, 0x1);
+    cpu.registers.PC = 0x101;
+    var absleval = cpu.readMemory(cpu.addressModes.ABSOLUTE);
+    assert.equal(absleval, 0x1, 'ABSOLUTE address mode reads value (little endian)');
+
+    mmc.store(0x101, 0xcc);
+    mmc.store(0x102, 0x99);
+    mmc.store(0x99cc, 0x1);
+    cpu.registers.PC = 0x100;
+    cpu.registers.X = 0x1;
+    var absxval = cpu.readMemory(cpu.addressModes.ABSOLUTE_X);
+    assert.equal(absxval, 0x1, 'ABSOLUTE X address mode reads value');
+
+    mmc.store(0x103, 0x99);
+    mmc.store(0x104, 0xcc);
+    mmc.store(0xcc99, 0x1);
+    cpu.registers.PC = 0x100;
+    cpu.registers.Y = 0x3;
+    var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y);
+    assert.equal(absyval, 0x1, 'ABSOLUTE Y address mode reads value');
+
+    mmc.store(0x00, 0x07);
+    mmc.store(0x10, 0x7);
+    mmc.store(0x11, 0x5);
+    mmc.store(0x507, 0x4);
+    cpu.registers.PC = 0x00;
+    cpu.registers.X = 0x09;
+    var preindex = cpu.readMemory(cpu.addressModes.INDEXED_INDIRECT);
+    assert.equal(preindex, 0x4, 'INDEXED INDIRECT address mode reads value');
+
+    mmc.store(0x00, 0x07);
+    mmc.store(0x07, 0x01);
+    mmc.store(0x08, 0x03);
+    mmc.store(0x302, 0x08);
+    cpu.registers.PC = 0x00;
+    cpu.registers.Y = 0x01;
+    var postindex = cpu.readMemory(cpu.addressModes.INDIRECT_INDEXED);
+    assert.equal(postindex, 0x8, 'INDIRECT INDEXED address mode reads value');
+});
+
+
+
 QUnit.test("6502 LDA #", function( assert ) {
 
     cpu.reset();

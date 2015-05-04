@@ -51,12 +51,6 @@
 
     };
 
-    function unimplemented(){
-        throw "Not implemented yet";
-    }
-
-
-
     /**
      * Enumeration of address modes
      */
@@ -72,7 +66,8 @@
         RELATIVE:           8,  // r
         ABSOLUTE:           9,  // a
         ABSOLUTE_X:         10, // a, X
-        ABSOLUTE_Y:         11 // a, Y
+        ABSOLUTE_Y:         11, // a, Y,
+        INDIRECT_ABSOLUTE:  12 // ? - only used for JMP?
     };
 
     window.JNE.NES6502.prototype.getOpcodeText = function(opcode){
@@ -345,19 +340,79 @@
      */
     window.JNE.NES6502.prototype.readMemory = function(addressMode){
 
-        var address = null;
+        var address;
 
         switch(addressMode){
             case this.addressModes.IMMEDIATE:
-                address = this.registers.PC++;
-                break;
+                // 8 bit
+                return this.mmc.fetch(this.registers.PC++);
+            case this.addressModes.ACCUMULATOR:
+                return this.registers.A;
+            case this.addressModes.ZERO_PAGE:
+                // 8 bit
+                return this.mmc.fetch(this.registers.PC++ & 0xf);
+            case this.addressModes.ZERO_PAGE_X:
+                // 8 bit
+                address = ((this.registers.PC++ & 0xf) + this.registers.X) & 0xf;
+                return this.mmc.fetch(address);
+            case this.addressModes.ZERO_PAGE_Y:
+                // 8 bit
+                address = ((this.registers.PC++ & 0xf) + this.registers.Y) & 0xf;
+                return this.mmc.fetch(address);
+            case this.addressModes.ABSOLUTE:
+                // 16 bit
+                address = this.registers.PC;
+                this.registers.PC += 2;
+                address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
+                return this.mmc.fetch(address);
+            case this.addressModes.ABSOLUTE_X:
+                //16 bit
+                address = this.registers.PC;
+                this.registers.PC += 2;
+                address = this.mmc.fetch(address + this.registers.X) | (this.mmc.fetch(address + 1 + this.registers.X) << 8);
+                return this.mmc.fetch(address);
+            case this.addressModes.ABSOLUTE_Y:
+                //16 bit
+                address = this.registers.PC;
+                this.registers.PC += 2;
+                address = this.mmc.fetch(address + this.registers.Y) | (this.mmc.fetch(address + 1 + this.registers.Y) << 8);
+                return this.mmc.fetch(address);
+            case this.addressModes.RELATIVE:
+
+                address = this.mmc.fetch(this.registers.PC++);
+
+                if(address < 0x80) {
+                    address += this.registers.PC;
+                }else{
+                    address += this.registers.PC - 0x10;
+                }
+
+                return this.mmc.fetch(address);
+
+            case this.addressModes.INDEXED_INDIRECT:
+
+                address = this.mmc.fetch(this.registers.PC++);
+                address = (address + this.registers.X) & 0xff;
+                address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
+                return this.mmc.fetch(address);
+
+            case this.addressModes.INDIRECT_INDEXED:
+
+                address = this.mmc.fetch(this.registers.PC++);
+                address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
+                address = (address + this.registers.Y) & 0xffff;
+                return this.mmc.fetch(address);
+
+            case this.addressModes.INDIRECT_ABSOLUTE:
+                throw "Not implemented"; //@TODO investigate this
+
             case this.addressModes.IMPLICIT:
                 throw "Cannot read memory for an implicit addressing mode operation";
             default:
                 throw "Unsupported addressing mode";
         }
 
-        return this.mmc.fetch(address);
+
     };
 
     window.JNE.NES6502.prototype.execute = function(){
