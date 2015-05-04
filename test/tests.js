@@ -165,8 +165,8 @@ QUnit.test("6502 initialises registers", function( assert ) {
     assert.equal(cpu.registers.A, 0, 'Register A is initialised to 0x00');
     assert.equal(cpu.registers.X, 0, 'Register X is initialised to 0x00');
     assert.equal(cpu.registers.Y, 0, 'Register Y is initialised to 0x00');
-    assert.equal(cpu.registers.SP, 0xFF, 'Register SP is initialised to 0xFF');
-    assert.equal(cpu.registers.PC, 0, 'Register PC is initialised to 0x00');
+    assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is initialised to 0x01FF');
+    assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is initialised to 0x07FF');
     assert.equal(cpu.registers.P, 0, 'Register P is initialised to 0x00');
 
 });
@@ -185,8 +185,8 @@ QUnit.test("6502 reset state", function( assert ) {
     assert.equal(cpu.registers.A, 0, 'Register A is reset to 0x00');
     assert.equal(cpu.registers.X, 0, 'Register X is reset to 0x00');
     assert.equal(cpu.registers.Y, 0, 'Register Y is reset to 0x00');
-    assert.equal(cpu.registers.SP, 0xFF, 'Register SP is reset to 0xFF');
-    assert.equal(cpu.registers.PC, 0, 'Register PC is reset to 0x00');
+    assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is reset to 0x01FF');
+    assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is reset to 0x07FF');
     assert.equal(cpu.registers.P, 0, 'Register P is reset to 0x00');
 
 });
@@ -582,16 +582,16 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
 
     mmc.store(0x101, 0xcc);
     mmc.store(0x102, 0x99);
-    mmc.store(0x99cc, 0x1);
-    cpu.registers.PC = 0x100;
+    mmc.store(0x99cd, 0x1);
+    cpu.registers.PC = 0x101;
     cpu.registers.X = 0x1;
     var absxval = cpu.readMemory(cpu.addressModes.ABSOLUTE_X);
     assert.equal(absxval, 0x1, 'ABSOLUTE X address mode reads value');
 
-    mmc.store(0x103, 0x99);
+    mmc.store(0x103, 0x33);
     mmc.store(0x104, 0xcc);
-    mmc.store(0xcc99, 0x1);
-    cpu.registers.PC = 0x100;
+    mmc.store(0xcc36, 0x1);
+    cpu.registers.PC = 0x103;
     cpu.registers.Y = 0x3;
     var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y);
     assert.equal(absyval, 0x1, 'ABSOLUTE Y address mode reads value');
@@ -615,8 +615,6 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     assert.equal(postindex, 0x8, 'INDIRECT INDEXED address mode reads value');
 });
 
-
-
 QUnit.test("6502 LDA #", function( assert ) {
 
     cpu.reset();
@@ -626,15 +624,14 @@ QUnit.test("6502 LDA #", function( assert ) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    var cycles = cpu.execute();
 
-    //@TODO add more assertions for LDA operations e.g. cycles etc.
-
+    assert.equal(cycles, 2, 'LDA # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
 
     mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x7);
+    mmc.store(0x201, 0x8);
     mmc.store(0x202, 0xA9);
     mmc.store(0x203, 0xf);
     mmc.store(0x204, 0xA9);
@@ -643,14 +640,14 @@ QUnit.test("6502 LDA #", function( assert ) {
     cpu.registers.PC = 0x200;
 
     cpu.execute();
-    assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
-    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice times for LDA #');
+    assert.equal(cpu.registers.A, 0x08, '"A" register has value 0x08 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
     cpu.execute();
     assert.equal(cpu.registers.A, 0x0f, '"A" register has value 0x0f stored');
-    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice times for LDA #');
+    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDA #');
     cpu.execute();
     assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
-    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice times for LDA #');
+    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDA #');
 
     //@TODO add more assertions for LDA operations e.g. cycles etc.
 
