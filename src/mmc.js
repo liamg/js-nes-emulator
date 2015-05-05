@@ -20,7 +20,7 @@
      */
     window.JNE.MMC = function(){
         this.debug = false;
-        this.size = 0xffff; // default to 65536 bytes
+        this.size = 0x10000; // default to 65536 bytes
         this.memory = new Array(this.size);
         this.reset();
     };

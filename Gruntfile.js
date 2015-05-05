@@ -3,7 +3,19 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         qunit: {
-            files: ['test/index.html']
+            files: ['test/index.html'],
+            options: {
+                timeout: 30000,
+                "--web-security": "no",
+                coverage: {
+                    src: [ "src/*.js" ],
+                    instrumentedFiles: "temp/",
+                    coberturaReport: "report/",
+                    htmlReport: "dist/report/coverage",
+                    lcovReport: "dist/report/lcov",
+                    linesThresholdPct: 70
+                }
+            }
         },
         copy: {
             main: {
@@ -38,18 +50,35 @@ module.exports = function(grunt) {
                 }
             }
         },
+        coveralls: {
+            options: {
+                // LCOV coverage file relevant to every target
+                src: 'dist/report/lcov/lcov.info',
+
+                // When true, grunt-coveralls will only print a warning rather than
+                // an error, to prevent CI builds from failing unnecessarily (e.g. if
+                // coveralls.io is down). Optional, defaults to false.
+                force: true
+            },
+            ci: {
+                // Target-specific LCOV coverage file
+                src: 'dist/report/lcov/lcov.info'
+            }
+        },
         watch: {
             files: ['<%= jshint.files %>'],
             tasks: ['jshint', 'qunit']
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-qunit-istanbul');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-coveralls');
 
     grunt.registerTask('default', ['jshint', 'copy', 'concat', 'uglify']);
-    grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('test', ['jshint', 'qunit', 'coveralls']);
+    grunt.registerTask('coverage', ['coverage']);
 };

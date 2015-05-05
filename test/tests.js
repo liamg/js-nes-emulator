@@ -9,9 +9,9 @@ QUnit.module( "MMC", {
 
 QUnit.test("MMC initialises memory", function( assert ) {
 
-    assert.equal(mmc.size, 0xFFFF, 'MMC is configured to initialise 65536 bytes of memory.');
+    assert.equal(mmc.size, 0x10000, 'MMC is configured to initialise 65536 bytes of memory.');
 
-    assert.equal(mmc.memory.length, 0xFFFF, 'Memory initialised is of size 65536 bytes.');
+    assert.equal(mmc.memory.length, 0x10000, 'Memory initialised is of size 65536 bytes.');
 
     assert.equal(mmc.fetch(0), 0, 'Memory at zero offset has zero value.');
     assert.equal(mmc.fetch(0x01), 0, 'Memory at 0x01 offset has zero value.');
@@ -29,7 +29,7 @@ QUnit.test("MMC resets memory to zero byte values", function( assert ) {
 
     mmc.reset();
 
-    assert.equal(mmc.memory.length, 0xFFFF, 'Memory is still of size 65536 bytes after reset.');
+    assert.equal(mmc.memory.length, 0x10000, 'Memory is still of size 65536 bytes after reset.');
 
     assert.equal(mmc.fetch(0), 0, 'Memory at zero offset has zero value.');
     assert.equal(mmc.fetch(0x01), 0, 'Memory at 0x01 offset has zero value.');
