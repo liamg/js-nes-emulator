@@ -42,7 +42,7 @@
      */
     window.JNE.MMC.prototype.fetch = function(address){
         this.validateAddress(address);
-        if(this.debug) console.log('Reading address 0x' + address.toString(16) + ' - value is 0x' + this.memory[address].toString(16));
+        //if(this.debug) console.log('Reading address 0x' + address.toString(16) + ' - value is 0x' + this.memory[address].toString(16));
         return this.memory[address];
     };
 
@@ -53,7 +53,7 @@
      */
     window.JNE.MMC.prototype.store = function(address, value){
         this.validateAddress(address);
-        if(this.debug) console.log('Writing value ' + value.toString(16) + ' to address 0x' + address.toString(16));
+        //if(this.debug) console.log('Writing value ' + value.toString(16) + ' to address 0x' + address.toString(16));
         this.memory[address] = value;
     };
 

@@ -160,7 +160,7 @@ QUnit.module( "6502 CPU", {
     }
 });
 
-QUnit.test("6502 initialises registers/flags", function( assert ) {
+QUnit.test("Initialises registers/flags", function( assert ) {
 
     assert.equal(cpu.registers.A, 0, 'Register A is initialised to 0x00');
     assert.equal(cpu.registers.X, 0, 'Register X is initialised to 0x00');
@@ -175,7 +175,7 @@ QUnit.test("6502 initialises registers/flags", function( assert ) {
 
 });
 
-QUnit.test("6502 reset state", function( assert ) {
+QUnit.test("Reset state", function( assert ) {
 
     cpu.registers.A = 0x99;
     cpu.registers.X = 0x99;
@@ -199,7 +199,7 @@ QUnit.test("6502 reset state", function( assert ) {
 
 });
 
-QUnit.test("6502 instruction table contains valid instructions", function( assert ) {
+QUnit.test("Instruction table contains valid instructions", function( assert ) {
 
     function decodeInstruction(opcode){
 
@@ -537,15 +537,15 @@ QUnit.test("6502 instruction table contains valid instructions", function( asser
 });
 
 
-QUnit.test("6502 Memory reads in different address modes", function( assert ) {
+QUnit.test("Memory reads in different address modes", function( assert ) {
 
     cpu.registers.A = 0x9;
-    var accumulator = cpu.readMemory(cpu.addressModes.ACCUMULATOR);
+    var accumulator = cpu.readMemory(cpu.addressModes.ACCUMULATOR).value;
     assert.equal(accumulator, 0x9, 'ACCUMULATOR address mode reads value');
 
     mmc.store(0xf, 0xff);
     cpu.registers.PC = 0xf;
-    var imm = cpu.readMemory(cpu.addressModes.IMMEDIATE);
+    var imm = cpu.readMemory(cpu.addressModes.IMMEDIATE).value;
     assert.equal(imm, 0xff, 'IMMEDIATE address mode reads value');
 
     mmc.store(0x101, 0x3);
@@ -554,38 +554,47 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     mmc.store(0x104, 0x7);
     mmc.store(0x105, 0x6);
     cpu.registers.PC = 0x101;
-    var rel = cpu.readMemory(cpu.addressModes.RELATIVE);
+    var rel = cpu.readMemory(cpu.addressModes.RELATIVE).value;
     assert.equal(rel, 0x6, 'RELATIVE address mode reads value');
+
+    mmc.store(0x101, 0x3);
+    mmc.store(0x102, 0x9);
+    mmc.store(0x103, 0x82);
+    mmc.store(0x104, 0x7);
+    mmc.store(0x105, 0x6);
+    cpu.registers.PC = 0x103;
+    rel = cpu.readMemory(cpu.addressModes.RELATIVE).value;
+    assert.equal(rel, 0x9, 'RELATIVE address mode reads value when negative offset');
 
     mmc.store(0xf, 0x1);
     cpu.registers.PC = 0xf;
-    var zpval = cpu.readMemory(cpu.addressModes.ZERO_PAGE);
+    var zpval = cpu.readMemory(cpu.addressModes.ZERO_PAGE).value;
     assert.equal(zpval, 0x1, 'ZERO PAGE address mode reads value');
 
     mmc.store(0x6, 0x2);
     cpu.registers.PC = 0x3;
     cpu.registers.X = 0x3;
-    var zpxval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_X);
+    var zpxval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_X).value;
     assert.equal(zpxval, 0x2, 'ZERO PAGE X address mode reads value');
 
     mmc.store(0xa, 0x3);
     cpu.registers.PC = 0x8;
     cpu.registers.Y = 0x2;
-    var zpyval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_Y);
+    var zpyval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_Y).value;
     assert.equal(zpyval, 0x3, 'ZERO PAGE Y address mode reads value');
 
     mmc.store(0x101, 0xaa);
     mmc.store(0x102, 0xaa);
     mmc.store(0xaaaa, 0x1);
     cpu.registers.PC = 0x101;
-    var absval = cpu.readMemory(cpu.addressModes.ABSOLUTE);
+    var absval = cpu.readMemory(cpu.addressModes.ABSOLUTE).value;
     assert.equal(absval, 0x1, 'ABSOLUTE address mode reads value');
 
     mmc.store(0x101, 0x01);
     mmc.store(0x102, 0xcc);
     mmc.store(0xcc01, 0x1);
     cpu.registers.PC = 0x101;
-    var absleval = cpu.readMemory(cpu.addressModes.ABSOLUTE);
+    var absleval = cpu.readMemory(cpu.addressModes.ABSOLUTE).value;
     assert.equal(absleval, 0x1, 'ABSOLUTE address mode reads value (little endian)');
 
     mmc.store(0x101, 0xcc);
@@ -593,7 +602,7 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     mmc.store(0x99cd, 0x1);
     cpu.registers.PC = 0x101;
     cpu.registers.X = 0x1;
-    var absxval = cpu.readMemory(cpu.addressModes.ABSOLUTE_X);
+    var absxval = cpu.readMemory(cpu.addressModes.ABSOLUTE_X).value;
     assert.equal(absxval, 0x1, 'ABSOLUTE X address mode reads value');
 
     mmc.store(0x103, 0x33);
@@ -601,7 +610,7 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     mmc.store(0xcc36, 0x1);
     cpu.registers.PC = 0x103;
     cpu.registers.Y = 0x3;
-    var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y);
+    var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y).value;
     assert.equal(absyval, 0x1, 'ABSOLUTE Y address mode reads value');
 
     mmc.store(0x00, 0x07);
@@ -610,7 +619,7 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     mmc.store(0x507, 0x4);
     cpu.registers.PC = 0x00;
     cpu.registers.X = 0x09;
-    var preindex = cpu.readMemory(cpu.addressModes.INDEXED_INDIRECT);
+    var preindex = cpu.readMemory(cpu.addressModes.INDEXED_INDIRECT).value;
     assert.equal(preindex, 0x4, 'INDEXED INDIRECT address mode reads value');
 
     mmc.store(0x00, 0x07);
@@ -619,8 +628,42 @@ QUnit.test("6502 Memory reads in different address modes", function( assert ) {
     mmc.store(0x302, 0x08);
     cpu.registers.PC = 0x00;
     cpu.registers.Y = 0x01;
-    var postindex = cpu.readMemory(cpu.addressModes.INDIRECT_INDEXED);
+    var postindex = cpu.readMemory(cpu.addressModes.INDIRECT_INDEXED).value;
     assert.equal(postindex, 0x8, 'INDIRECT INDEXED address mode reads value');
+
+    assert.throws(
+        function(){
+            cpu.readMemory(0xff);
+        },
+        /Unsupported addressing mode/,
+        'Error thrown on unknown address mode'
+    );
+
+    assert.throws(
+        function(){
+            cpu.readMemory(cpu.addressModes.IMPLICIT);
+        },
+        /Cannot read memory for an implicit addressing mode operation/,
+        'Error thrown on implicit address mode read'
+    );
+
+
+
+});
+
+QUnit.test("Invalid opcode check", function( assert ) {
+
+    mmc.store(0x200, 0xff);
+
+    cpu.registers.PC = 0x200;
+
+    assert.throws(
+        function(){
+            cpu.execute();
+        },
+        /Invalid opcode/,
+        'Error thrown on invalid opcode'
+    );
 });
 
 QUnit.test("LDA #", function( assert ) {
@@ -705,5 +748,176 @@ QUnit.test("NOP", function( assert ) {
 
 });
 
-// @TODO add tests for reset of flags
+QUnit.test("ADC #", function( assert ) {
 
+    cpu.registers.A = 0x02;
+
+    mmc.store(0x200, 0x69); // ADC
+    mmc.store(0x201, 0x01); // #3
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ADC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x03, '"A" register has value 0x03 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+
+    cpu.reset();
+
+    // test carry bit is added
+
+    cpu.registers.A = 0x02;
+
+    mmc.store(0x200, 0x69); // ADC
+    mmc.store(0x201, 0x01); // #$1
+
+    cpu.registers.PC = 0x200;
+
+    cpu.flags.carry = 1;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ADC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+
+
+    cpu.reset();
+
+    // test multi-byte addition
+
+    cpu.registers.A = 0x02;
+    cpu.registers.PC = 0x200;
+    cpu.flags.carry = 0;
+
+    mmc.store(0x200, 0x69); // ADC
+    mmc.store(0x201, 0xff); // #$ff
+    mmc.store(0x202, 0x69); // ADC
+    mmc.store(0x203, 0x00); // #$0
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x01, '"A" register has value 0x01 stored');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when adding 0xff + 0x1');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Additional ADC # call takes 2 further cycles');
+    assert.equal(cpu.registers.A, 0x02, '"A" register has value 0x02 stored');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is set when adding 0xff + 0x1');
+    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice further for additonal ADC #');
+
+
+
+});
+
+
+QUnit.test("AND #", function( assert ) {
+
+    cpu.registers.A = 0x02;
+
+    mmc.store(0x200, 0x29); // AND
+    mmc.store(0x201, 0x01); // #$1
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'AND # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for AND #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
+
+    cpu.reset();
+
+    cpu.registers.A = 0xff;
+
+    mmc.store(0x200, 0x29); // AND
+    mmc.store(0x201, 0x47); // #$47
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'AND # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x47, '"A" register has value 0x00 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for AND #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is not set');
+
+
+});
+
+
+QUnit.test("ASL", function( assert ) {
+
+    cpu.registers.A = 0xc;
+
+    mmc.store(0x200, 0x0A); // ASL A
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ASL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x18, '"A" register has value 0x18 stored');
+    assert.equal(cpu.registers.PC, 0x201, 'Program counter is incremented once for ASL A');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is not set');
+
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x0E); // ASL a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ASL a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0xE, 'Memory at 0x203 has value 0xE stored');
+    assert.equal(cpu.registers.PC, 0x203, 'Program counter is incremented 3 times for ASL a');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
+
+
+});
+
+QUnit.test("BCC r", function( assert ) {
+
+    cpu.flags.carry = 1;
+
+    mmc.store(0x200, 0x90); // BCC +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BCC r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if carry not clear');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x90); // BCC +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BCC r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is clear');
+});

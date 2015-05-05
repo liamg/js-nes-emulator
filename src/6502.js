@@ -83,14 +83,12 @@
         for(var i in this.opcodes){
             if(this.opcodes[i] == opcode) return i;
         }
-        return '0x' + opcode.toString(16);
     };
 
     window.JNE.NES6502.prototype.getAddressModeText = function(address_mode){
         for(var i in this.addressModes){
             if(this.addressModes[i] == address_mode) return i;
         }
-        return '0x' + address_mode.toString(16);
     };
 
     /**
@@ -164,42 +162,42 @@
     window.JNE.NES6502.prototype.instruction_table[0x0] = [window.JNE.NES6502.prototype.opcodes.BRK, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
     window.JNE.NES6502.prototype.instruction_table[0x1] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT];
     window.JNE.NES6502.prototype.instruction_table[0x5] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
-    window.JNE.NES6502.prototype.instruction_table[0x6] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
+    window.JNE.NES6502.prototype.instruction_table[0x6] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE, 5];
     window.JNE.NES6502.prototype.instruction_table[0x8] = [window.JNE.NES6502.prototype.opcodes.PHP, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
     window.JNE.NES6502.prototype.instruction_table[0x9] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.IMMEDIATE];
-    window.JNE.NES6502.prototype.instruction_table[0xa] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ACCUMULATOR];
+    window.JNE.NES6502.prototype.instruction_table[0xa] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ACCUMULATOR, 2];
     window.JNE.NES6502.prototype.instruction_table[0xd] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0xe] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
+    window.JNE.NES6502.prototype.instruction_table[0xe] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE, 6];
 
     window.JNE.NES6502.prototype.instruction_table[0x10] = [window.JNE.NES6502.prototype.opcodes.BPL, window.JNE.NES6502.prototype.addressModes.RELATIVE];
     window.JNE.NES6502.prototype.instruction_table[0x11] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED];
     window.JNE.NES6502.prototype.instruction_table[0x15] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
-    window.JNE.NES6502.prototype.instruction_table[0x16] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x16] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X, 6];
     window.JNE.NES6502.prototype.instruction_table[0x18] = [window.JNE.NES6502.prototype.opcodes.CLC, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
     window.JNE.NES6502.prototype.instruction_table[0x19] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_Y];
     window.JNE.NES6502.prototype.instruction_table[0x1d] = [window.JNE.NES6502.prototype.opcodes.ORA, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
-    window.JNE.NES6502.prototype.instruction_table[0x1e] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x1e] = [window.JNE.NES6502.prototype.opcodes.ASL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X, 7];
 
     window.JNE.NES6502.prototype.instruction_table[0x20] = [window.JNE.NES6502.prototype.opcodes.JSR, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0x21] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT];
+    window.JNE.NES6502.prototype.instruction_table[0x21] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT, 6];
     window.JNE.NES6502.prototype.instruction_table[0x24] = [window.JNE.NES6502.prototype.opcodes.BIT, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
-    window.JNE.NES6502.prototype.instruction_table[0x25] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
+    window.JNE.NES6502.prototype.instruction_table[0x25] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE, 3];
     window.JNE.NES6502.prototype.instruction_table[0x26] = [window.JNE.NES6502.prototype.opcodes.ROL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
     window.JNE.NES6502.prototype.instruction_table[0x28] = [window.JNE.NES6502.prototype.opcodes.PLP, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
-    window.JNE.NES6502.prototype.instruction_table[0x29] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.IMMEDIATE];
+    window.JNE.NES6502.prototype.instruction_table[0x29] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.IMMEDIATE, 2];
     window.JNE.NES6502.prototype.instruction_table[0x2a] = [window.JNE.NES6502.prototype.opcodes.ROL, window.JNE.NES6502.prototype.addressModes.ACCUMULATOR];
     window.JNE.NES6502.prototype.instruction_table[0x2c] = [window.JNE.NES6502.prototype.opcodes.BIT, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0x2d] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
+    window.JNE.NES6502.prototype.instruction_table[0x2d] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE, 4];
     window.JNE.NES6502.prototype.instruction_table[0x2e] = [window.JNE.NES6502.prototype.opcodes.ROL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
 
     window.JNE.NES6502.prototype.instruction_table[0x30] = [window.JNE.NES6502.prototype.opcodes.BMI, window.JNE.NES6502.prototype.addressModes.RELATIVE];
-    window.JNE.NES6502.prototype.instruction_table[0x31] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED];
-    window.JNE.NES6502.prototype.instruction_table[0x35] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x31] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED, 5];
+    window.JNE.NES6502.prototype.instruction_table[0x35] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X, 4];
     window.JNE.NES6502.prototype.instruction_table[0x36] = [window.JNE.NES6502.prototype.opcodes.ROL, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
     window.JNE.NES6502.prototype.instruction_table[0x38] = [window.JNE.NES6502.prototype.opcodes.SEC, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
-    window.JNE.NES6502.prototype.instruction_table[0x39] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_Y];
+    window.JNE.NES6502.prototype.instruction_table[0x39] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_Y, 4];
     window.JNE.NES6502.prototype.instruction_table[0x3c] = [window.JNE.NES6502.prototype.opcodes.BIT, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
-    window.JNE.NES6502.prototype.instruction_table[0x3d] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x3d] = [window.JNE.NES6502.prototype.opcodes.AND, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X, 4];
     window.JNE.NES6502.prototype.instruction_table[0x3e] = [window.JNE.NES6502.prototype.opcodes.ROL, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
     window.JNE.NES6502.prototype.instruction_table[0x40] = [window.JNE.NES6502.prototype.opcodes.RTI, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
     window.JNE.NES6502.prototype.instruction_table[0x41] = [window.JNE.NES6502.prototype.opcodes.EOR, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT];
@@ -224,26 +222,26 @@
     window.JNE.NES6502.prototype.instruction_table[0x5d] = [window.JNE.NES6502.prototype.opcodes.EOR, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
     window.JNE.NES6502.prototype.instruction_table[0x5e] = [window.JNE.NES6502.prototype.opcodes.LSR, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
     window.JNE.NES6502.prototype.instruction_table[0x60] = [window.JNE.NES6502.prototype.opcodes.RTS, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
-    window.JNE.NES6502.prototype.instruction_table[0x61] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT];
+    window.JNE.NES6502.prototype.instruction_table[0x61] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT, 6];
     window.JNE.NES6502.prototype.instruction_table[0x62] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.IMMEDIATE];
     window.JNE.NES6502.prototype.instruction_table[0x64] = [window.JNE.NES6502.prototype.opcodes.JMP_ABS, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
-    window.JNE.NES6502.prototype.instruction_table[0x65] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
+    window.JNE.NES6502.prototype.instruction_table[0x65] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE, 3];
     window.JNE.NES6502.prototype.instruction_table[0x66] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE];
     window.JNE.NES6502.prototype.instruction_table[0x68] = [window.JNE.NES6502.prototype.opcodes.PLA, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
-    window.JNE.NES6502.prototype.instruction_table[0x69] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.IMMEDIATE];
+    window.JNE.NES6502.prototype.instruction_table[0x69] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.IMMEDIATE, 2];
     window.JNE.NES6502.prototype.instruction_table[0x6a] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.ACCUMULATOR];
     window.JNE.NES6502.prototype.instruction_table[0x6c] = [window.JNE.NES6502.prototype.opcodes.JMP_ABS, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0x6d] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
+    window.JNE.NES6502.prototype.instruction_table[0x6d] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE, 4];
     window.JNE.NES6502.prototype.instruction_table[0x6e] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0x70] = [window.JNE.NES6502.prototype.opcodes.BVS, window.JNE.NES6502.prototype.addressModes.RELATIVE];
-    window.JNE.NES6502.prototype.instruction_table[0x71] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED];
+    window.JNE.NES6502.prototype.instruction_table[0x71] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED, 5];
     window.JNE.NES6502.prototype.instruction_table[0x74] = [window.JNE.NES6502.prototype.opcodes.JMP_ABS, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
-    window.JNE.NES6502.prototype.instruction_table[0x75] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x75] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X, 4];
     window.JNE.NES6502.prototype.instruction_table[0x76] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
     window.JNE.NES6502.prototype.instruction_table[0x78] = [window.JNE.NES6502.prototype.opcodes.SEI, window.JNE.NES6502.prototype.addressModes.IMPLICIT];
-    window.JNE.NES6502.prototype.instruction_table[0x79] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_Y];
+    window.JNE.NES6502.prototype.instruction_table[0x79] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_Y, 4];
     window.JNE.NES6502.prototype.instruction_table[0x7c] = [window.JNE.NES6502.prototype.opcodes.JMP_ABS, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
-    window.JNE.NES6502.prototype.instruction_table[0x7d] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
+    window.JNE.NES6502.prototype.instruction_table[0x7d] = [window.JNE.NES6502.prototype.opcodes.ADC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X, 4];
     window.JNE.NES6502.prototype.instruction_table[0x7e] = [window.JNE.NES6502.prototype.opcodes.ROR, window.JNE.NES6502.prototype.addressModes.ABSOLUTE_X];
     window.JNE.NES6502.prototype.instruction_table[0x80] = [window.JNE.NES6502.prototype.opcodes.STY, window.JNE.NES6502.prototype.addressModes.IMMEDIATE];
     window.JNE.NES6502.prototype.instruction_table[0x81] = [window.JNE.NES6502.prototype.opcodes.STA, window.JNE.NES6502.prototype.addressModes.INDEXED_INDIRECT];
@@ -257,7 +255,7 @@
     window.JNE.NES6502.prototype.instruction_table[0x8c] = [window.JNE.NES6502.prototype.opcodes.STY, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0x8d] = [window.JNE.NES6502.prototype.opcodes.STA, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0x8e] = [window.JNE.NES6502.prototype.opcodes.STX, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0x90] = [window.JNE.NES6502.prototype.opcodes.BCC, window.JNE.NES6502.prototype.addressModes.RELATIVE];
+    window.JNE.NES6502.prototype.instruction_table[0x90] = [window.JNE.NES6502.prototype.opcodes.BCC, window.JNE.NES6502.prototype.addressModes.RELATIVE, 2];
     window.JNE.NES6502.prototype.instruction_table[0x91] = [window.JNE.NES6502.prototype.opcodes.STA, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED];
     window.JNE.NES6502.prototype.instruction_table[0x94] = [window.JNE.NES6502.prototype.opcodes.STY, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
     window.JNE.NES6502.prototype.instruction_table[0x95] = [window.JNE.NES6502.prototype.opcodes.STA, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
@@ -339,35 +337,45 @@
     /**
      * Reads the appropriate memory location and returns the value, depending on the address mode
      * @param addressMode number The address mode of the current operation.
-     * @returns number
+     * @returns object
      */
     window.JNE.NES6502.prototype.readMemory = function(addressMode){
 
         var address;
+        var value;
 
         switch(addressMode){
             case this.addressModes.IMMEDIATE:
                 // 8 bit
-                return this.mmc.fetch(this.registers.PC++);
+                address = this.registers.PC++;
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.ACCUMULATOR:
-                return this.registers.A;
+                address = null;
+                value = this.registers.A;
+                break;
             case this.addressModes.ZERO_PAGE:
                 // 8 bit
-                return this.mmc.fetch(this.registers.PC++ & 0xf);
+                address = this.registers.PC++ & 0xff;
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.ZERO_PAGE_X:
                 // 8 bit
-                address = ((this.registers.PC++ & 0xf) + this.registers.X) & 0xf;
-                return this.mmc.fetch(address);
+                address = ((this.registers.PC++ & 0xff) + this.registers.X) & 0xff;
+                value =  this.mmc.fetch(address);
+                break;
             case this.addressModes.ZERO_PAGE_Y:
                 // 8 bit
-                address = ((this.registers.PC++ & 0xf) + this.registers.Y) & 0xf;
-                return this.mmc.fetch(address);
+                address = ((this.registers.PC++ & 0xff) + this.registers.Y) & 0xff;
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.ABSOLUTE:
                 // 16 bit
                 address = this.registers.PC;
                 this.registers.PC += 2;
                 address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
-                return this.mmc.fetch(address);
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.ABSOLUTE_X:
                 //16 bit
                 address = this.registers.PC;
@@ -376,7 +384,9 @@
                 if((address & 0xFF00) != ((address + this.registers.X) & 0xFF00)) {
                     this.memoryCycles += 1;
                 }
-                return this.mmc.fetch(address + this.registers.X);
+                address = address + this.registers.X;
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.ABSOLUTE_Y:
                 //16 bit
                 address = this.registers.PC;
@@ -385,59 +395,123 @@
                 if((address & 0xFF00) != ((address + this.registers.Y) & 0xFF00)) {
                     this.memoryCycles += 1;
                 }
-                return this.mmc.fetch(address + this.registers.Y);
+                address = address + this.registers.Y;
+                value =  this.mmc.fetch(address);
+                break;
             case this.addressModes.RELATIVE:
 
                 address = this.mmc.fetch(this.registers.PC++);
 
                 if(address < 0x80) {
-                    address += this.registers.PC;
+                    address = this.registers.PC + address;
                 }else{
-                    address += this.registers.PC - 0x10;
+                    address = this.registers.PC - (address - 0x80);
                 }
 
-                return this.mmc.fetch(address);
-
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.INDEXED_INDIRECT:
 
                 address = this.mmc.fetch(this.registers.PC++);
                 address = (address + this.registers.X) & 0xff;
                 address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
-                return this.mmc.fetch(address);
-
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.INDIRECT_INDEXED:
 
                 address = this.mmc.fetch(this.registers.PC++);
                 address = this.mmc.fetch(address) | (this.mmc.fetch(address + 1) << 8);
                 address = (address + this.registers.Y) & 0xffff;
-                return this.mmc.fetch(address);
-
+                value = this.mmc.fetch(address);
+                break;
             case this.addressModes.INDIRECT_ABSOLUTE:
                 throw "Not implemented"; //@TODO investigate this
-
             case this.addressModes.IMPLICIT:
                 throw "Cannot read memory for an implicit addressing mode operation";
             default:
                 throw "Unsupported addressing mode";
         }
 
+        return {
+            address: address,
+            value: value
+        };
 
     };
 
+    // http://www.obelisk.demon.co.uk/6502/reference.html#LDA
     window.JNE.NES6502.prototype.operations = [];
+
     window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.LDA] = function(addressMode) {
-        var value = this.readMemory(addressMode);
+        var value = this.readMemory(addressMode).value;
         this.registers.A = value;
         this.flags.zero = this.registers.A === 0 ? 1 : 0;
         this.flags.negative = this.registers.A & 0x80 ? 1 : 0;
     };
+
     window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.NOP] = function(addressMode) {
-        return 0;
+        //nothing!
+    };
+
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.ADC] = function(addressMode) {
+
+        var mem = this.readMemory(addressMode).value;
+
+        var tmp = this.registers.A + mem + this.flags.carry;
+        this.flags.overflow = ((this.registers.A ^ mem) & 0x80) === 0 && ((this.registers.A ^ tmp) & 0x80) !== 0 ? 1 : 0;
+        this.flags.carry = tmp > 0xff ? 1 : 0;
+        this.flags.negative = tmp & 0x80 ? 1 : 0;
+        this.flags.zero = this.registers.A === 0;
+        this.registers.A = tmp & 0xff;
+
+    };
+
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.AND] = function(addressMode) {
+
+        this.registers.A = this.readMemory(addressMode).value & this.registers.A;
+        this.flags.negative = this.registers.A & 0x80 ? 1 : 0;
+        this.flags.zero = this.registers.A === 0;
+
+    };
+
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.ASL] = function(addressMode) {
+
+        var tmp = 0;
+
+        if(addressMode === this.addressModes.ACCUMULATOR){
+            tmp = this.registers.A << 1;
+            this.registers.A = tmp & 0xff;
+        }else {
+            var mem = this.readMemory(addressMode);
+            tmp = mem.value << 1;
+            this.mmc.store(mem.address, tmp & 0xff);
+        }
+
+        this.flags.carry = tmp > 0xff ? 1 : 0;
+        this.flags.negative = tmp & 0x80 ? 1 : 0;
+        this.flags.zero = this.registers.A === 0 ? 1 : 0;
+
+    };
+
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.BCC] = function(addressMode) {
+
+        if(this.flags.carry === 0){
+            this.extraCycles++;
+            var old_pc = this.registers.PC;
+            var inc = this.readMemory(addressMode).value;
+
+            this.registers.PC += inc;
+
+            if(Math.floor(this.registers.PC / 0x100) !== Math.floor(old_pc / 0x100)){
+                this.extraCycles++;
+            }
+        }
     };
 
     window.JNE.NES6502.prototype.execute = function(){
 
         this.memoryCycles = 0;
+        this.extraCycles = 0;
 
         var opcode = this.mmc.fetch(this.registers.PC++);
 
@@ -449,10 +523,7 @@
 
         this.operations[instruction[0]].apply(this, [instruction[1]]);
 
-        var cycles = instruction[2] + this.memoryCycles;
-
-        return cycles;
-
+        return instruction[2] + this.memoryCycles + this.extraCycles;
     };
 
 })();
