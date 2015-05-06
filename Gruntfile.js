@@ -79,6 +79,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
 
     grunt.registerTask('default', ['jshint', 'copy', 'concat', 'uglify']);
-    grunt.registerTask('test', ['jshint', 'qunit', 'coveralls']);
-    grunt.registerTask('coverage', ['coverage']);
+    grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('coverage', ['coveralls']);
 };

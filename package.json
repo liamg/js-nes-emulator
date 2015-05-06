@@ -8,7 +8,7 @@
   },
   "license": "GPL-3.0",
   "scripts": {
-    "test": "grunt --verbose test"
+    "test": "grunt --verbose test && grunt --verbose coverage"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

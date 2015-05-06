@@ -502,7 +502,7 @@
 
             this.registers.PC += inc;
 
-            if(Math.floor(this.registers.PC / 0x100) !== Math.floor(old_pc / 0x100)){
+            if(this.registers.PC & 0xFF00 !== old_pc & 0xFF00){
                 this.extraCycles++;
             }
         }
