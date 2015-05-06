@@ -323,7 +323,7 @@
     window.JNE.NES6502.prototype.instruction_table[0xec] = [window.JNE.NES6502.prototype.opcodes.CPX, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0xed] = [window.JNE.NES6502.prototype.opcodes.SBC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0xee] = [window.JNE.NES6502.prototype.opcodes.INC, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0xf0] = [window.JNE.NES6502.prototype.opcodes.BEQ, window.JNE.NES6502.prototype.addressModes.RELATIVE];
+    window.JNE.NES6502.prototype.instruction_table[0xf0] = [window.JNE.NES6502.prototype.opcodes.BEQ, window.JNE.NES6502.prototype.addressModes.RELATIVE, 2];
     window.JNE.NES6502.prototype.instruction_table[0xf1] = [window.JNE.NES6502.prototype.opcodes.SBC, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED];
     window.JNE.NES6502.prototype.instruction_table[0xf4] = [window.JNE.NES6502.prototype.opcodes.CPX, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
     window.JNE.NES6502.prototype.instruction_table[0xf5] = [window.JNE.NES6502.prototype.opcodes.SBC, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
@@ -511,6 +511,21 @@
     window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.BCS] = function(addressMode) {
 
         if(this.flags.carry === 1){
+            this.extraCycles++;
+            var old_pc = this.registers.PC;
+            var inc = this.readMemory(addressMode).value;
+
+            this.registers.PC += inc;
+
+            if((this.registers.PC & 0xFF00) !== (old_pc & 0xFF00)){
+                this.extraCycles++;
+            }
+        }
+    };
+
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.BEQ] = function(addressMode) {
+
+        if(this.flags.zero === 1){
             this.extraCycles++;
             var old_pc = this.registers.PC;
             var inc = this.readMemory(addressMode).value;

@@ -1006,3 +1006,55 @@ QUnit.test("BCS r", function( assert ) {
     assert.equal(cycles, 3, 'Successful BCS r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
 });
+
+QUnit.test("BEQ r", function( assert ) {
+
+    cpu.flags.zero = 0;
+
+    mmc.store(0x200, 0xF0); // BEQ +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BEQ r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if zero clear');
+
+    cpu.reset();
+
+    cpu.flags.zero = 1;
+
+    mmc.store(0x2fe, 0xF0); // BEQ +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BEQ r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry set and multi page');
+
+    cpu.reset();
+
+    cpu.flags.zero = 1;
+
+    mmc.store(0x200, 0xF0); // BEQ +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BEQ r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
+});
+
