@@ -687,6 +687,23 @@ QUnit.test("Invalid opcode check", function( assert ) {
     );
 });
 
+QUnit.test("Invalid opcode definition check", function( assert ) {
+
+    mmc.store(0x200, 0xff);
+
+    cpu.instruction_table[0xff] = [0,1];
+
+    cpu.registers.PC = 0x200;
+
+    assert.throws(
+        function(){
+            cpu.execute();
+        },
+        /Invalid instruction definition - wrong number of parameters/,
+        'Error thrown on use of opcode with invalid definition'
+    );
+});
+
 QUnit.test("LDA #", function( assert ) {
 
     mmc.store(0x200, 0xA9);
@@ -1057,4 +1074,90 @@ QUnit.test("BEQ r", function( assert ) {
     assert.equal(cycles, 3, 'Successful BEQ r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
 });
+
+QUnit.test("BIT a", function( assert ) {
+
+    mmc.store(0x200, 0x2C); // BIT a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0xff);
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0xff;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'BIT a takes 4 cycles');
+    assert.equal(cpu.flags.zero, 0, 'Zero flag is not set when BIT test run on 0xFF & 0xFF');
+    assert.equal(cpu.flags.negative, 1, 'Negative flag is set when memory location contains 0xFF');
+    assert.equal(cpu.flags.overflow, 1, 'Overflow flag is set when memory location contains 0xFF');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2C); // BIT a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x00);
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0xff;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'BIT a takes 4 cycles');
+    assert.equal(cpu.flags.zero, 1, 'Zero flag is set when BIT test run on 0x00 & 0xFF');
+    assert.equal(cpu.flags.negative, 0, 'Negative flag is not set when memory location contains 0x00');
+    assert.equal(cpu.flags.overflow, 0, 'Overflow flag is not set when memory location contains 0x00');
+
+});
+
+QUnit.test("BMI r", function( assert ) {
+
+    mmc.store(0x200, 0x30); // BMI +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BMI r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if zero clear');
+
+    cpu.reset();
+
+    cpu.flags.negative = 1;
+
+    mmc.store(0x2fe, 0x30); // BMI +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BMI r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry set and multi page');
+
+    cpu.reset();
+
+    cpu.flags.negative = 1;
+
+    mmc.store(0x200, 0x30); // BMI +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BMI r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
+});
+
 
