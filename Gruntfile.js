@@ -10,7 +10,7 @@ module.exports = function(grunt) {
                 coverage: {
                     src: [ "src/*.js" ],
                     instrumentedFiles: "temp/",
-                    coberturaReport: "report/",
+                    coberturaReport: "dist/report/",
                     htmlReport: "dist/report/coverage",
                     lcovReport: "dist/report/lcov",
                     linesThresholdPct: 70
