@@ -613,6 +613,27 @@ QUnit.test("Memory reads in different address modes", function( assert ) {
     var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y).value;
     assert.equal(absyval, 0x1, 'ABSOLUTE Y address mode reads value');
 
+
+    mmc.store(0x101, 0xff);
+    mmc.store(0x102, 0x77);
+    mmc.store(0x77ff, 0x1);
+    cpu.registers.PC = 0x101;
+    cpu.registers.X = 0x1;
+    cpu.memoryCycles = 0;
+    cpu.readMemory(cpu.addressModes.ABSOLUTE_X);
+    assert.equal(cpu.memoryCycles, 0x1, 'ABSOLUTE X address mode increments memory cycles for multi page');
+
+    mmc.store(0x101, 0xff);
+    mmc.store(0x102, 0x77);
+    mmc.store(0x77ff, 0x1);
+    cpu.registers.PC = 0x101;
+    cpu.registers.Y = 0x1;
+    cpu.memoryCycles = 0;
+    cpu.readMemory(cpu.addressModes.ABSOLUTE_Y);
+    assert.equal(cpu.memoryCycles, 0x1, 'ABSOLUTE Y address mode increments memory cycles for multi page');
+
+
+
     mmc.store(0x00, 0x07);
     mmc.store(0x10, 0x7);
     mmc.store(0x11, 0x5);
@@ -908,6 +929,21 @@ QUnit.test("BCC r", function( assert ) {
 
     cpu.reset();
 
+    mmc.store(0x2fe, 0x90); // BCC +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BCC r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry not set and multi page');
+
+    cpu.reset();
+
     mmc.store(0x200, 0x90); // BCC +2
     mmc.store(0x201, 0x01);
     mmc.store(0x202, 0x02);
@@ -920,4 +956,53 @@ QUnit.test("BCC r", function( assert ) {
 
     assert.equal(cycles, 3, 'Successful BCC r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is clear');
+});
+
+QUnit.test("BCS r", function( assert ) {
+
+    mmc.store(0x200, 0xB0); // BCS +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BCC r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if carry clear');
+
+    cpu.reset();
+
+    cpu.flags.carry = 1;
+
+    mmc.store(0x2fe, 0xB0); // BCS +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BCS r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry set and multi page');
+
+    cpu.reset();
+
+    cpu.flags.carry = 1;
+
+    mmc.store(0x200, 0xB0); // BCS +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BCS r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
 });

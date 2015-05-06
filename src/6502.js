@@ -278,7 +278,7 @@
     window.JNE.NES6502.prototype.instruction_table[0xac] = [window.JNE.NES6502.prototype.opcodes.LDY, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
     window.JNE.NES6502.prototype.instruction_table[0xad] = [window.JNE.NES6502.prototype.opcodes.LDA, window.JNE.NES6502.prototype.addressModes.ABSOLUTE, 4];
     window.JNE.NES6502.prototype.instruction_table[0xae] = [window.JNE.NES6502.prototype.opcodes.LDX, window.JNE.NES6502.prototype.addressModes.ABSOLUTE];
-    window.JNE.NES6502.prototype.instruction_table[0xb0] = [window.JNE.NES6502.prototype.opcodes.BCS, window.JNE.NES6502.prototype.addressModes.RELATIVE];
+    window.JNE.NES6502.prototype.instruction_table[0xb0] = [window.JNE.NES6502.prototype.opcodes.BCS, window.JNE.NES6502.prototype.addressModes.RELATIVE, 2];
     window.JNE.NES6502.prototype.instruction_table[0xb1] = [window.JNE.NES6502.prototype.opcodes.LDA, window.JNE.NES6502.prototype.addressModes.INDIRECT_INDEXED, 5];
     window.JNE.NES6502.prototype.instruction_table[0xb4] = [window.JNE.NES6502.prototype.opcodes.LDY, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X];
     window.JNE.NES6502.prototype.instruction_table[0xb5] = [window.JNE.NES6502.prototype.opcodes.LDA, window.JNE.NES6502.prototype.addressModes.ZERO_PAGE_X, 4];
@@ -502,13 +502,28 @@
 
             this.registers.PC += inc;
 
-            if(this.registers.PC & 0xFF00 !== old_pc & 0xFF00){
+            if((this.registers.PC & 0xFF00) !== (old_pc & 0xFF00)){
                 this.extraCycles++;
             }
         }
     };
 
-    window.JNE.NES6502.prototype.execute = function(){
+    window.JNE.NES6502.prototype.operations[window.JNE.NES6502.prototype.opcodes.BCS] = function(addressMode) {
+
+        if(this.flags.carry === 1){
+            this.extraCycles++;
+            var old_pc = this.registers.PC;
+            var inc = this.readMemory(addressMode).value;
+
+            this.registers.PC += inc;
+
+            if((this.registers.PC & 0xFF00) !== (old_pc & 0xFF00)){
+                this.extraCycles++;
+            }
+        }
+    };
+
+    window.JNE.NES6502.prototype.execute = function() {
 
         this.memoryCycles = 0;
         this.extraCycles = 0;
