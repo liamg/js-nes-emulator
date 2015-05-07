@@ -172,7 +172,7 @@
     NES6502.prototype.instruction_table[0xd] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.ABSOLUTE];
     NES6502.prototype.instruction_table[0xe] = [NES6502.prototype.opcodes.ASL, NES6502.prototype.addressModes.ABSOLUTE, 6];
 
-    NES6502.prototype.instruction_table[0x10] = [NES6502.prototype.opcodes.BPL, NES6502.prototype.addressModes.RELATIVE];
+    NES6502.prototype.instruction_table[0x10] = [NES6502.prototype.opcodes.BPL, NES6502.prototype.addressModes.RELATIVE, 2];
     NES6502.prototype.instruction_table[0x11] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.INDIRECT_INDEXED];
     NES6502.prototype.instruction_table[0x15] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.ZERO_PAGE_X];
     NES6502.prototype.instruction_table[0x16] = [NES6502.prototype.opcodes.ASL, NES6502.prototype.addressModes.ZERO_PAGE_X, 6];
@@ -304,7 +304,7 @@
     NES6502.prototype.instruction_table[0xcc] = [NES6502.prototype.opcodes.CPY, NES6502.prototype.addressModes.ABSOLUTE];
     NES6502.prototype.instruction_table[0xcd] = [NES6502.prototype.opcodes.CMP, NES6502.prototype.addressModes.ABSOLUTE];
     NES6502.prototype.instruction_table[0xce] = [NES6502.prototype.opcodes.DEC, NES6502.prototype.addressModes.ABSOLUTE];
-    NES6502.prototype.instruction_table[0xd0] = [NES6502.prototype.opcodes.BNE, NES6502.prototype.addressModes.RELATIVE];
+    NES6502.prototype.instruction_table[0xd0] = [NES6502.prototype.opcodes.BNE, NES6502.prototype.addressModes.RELATIVE, 2];
     NES6502.prototype.instruction_table[0xd1] = [NES6502.prototype.opcodes.CMP, NES6502.prototype.addressModes.INDIRECT_INDEXED];
     NES6502.prototype.instruction_table[0xd4] = [NES6502.prototype.opcodes.CPY, NES6502.prototype.addressModes.ZERO_PAGE_X];
     NES6502.prototype.instruction_table[0xd5] = [NES6502.prototype.opcodes.CMP, NES6502.prototype.addressModes.ZERO_PAGE_X];
@@ -583,6 +583,36 @@
         this.operations[instruction[0]].apply(this, [instruction[1]]);
 
         return instruction[2] + this.memoryCycles + this.extraCycles;
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.BNE] = function(addressMode) {
+
+        if(this.flags.zero === 0){
+            this.extraCycles++;
+            var old_pc = this.registers.PC;
+            var inc = this.readMemory(addressMode).value;
+
+            this.registers.PC += inc;
+
+            if((this.registers.PC & 0xFF00) !== (old_pc & 0xFF00)){
+                this.extraCycles++;
+            }
+        }
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.BPL] = function(addressMode) {
+
+        if(this.flags.negative === 0){
+            this.extraCycles++;
+            var old_pc = this.registers.PC;
+            var inc = this.readMemory(addressMode).value;
+
+            this.registers.PC += inc;
+
+            if((this.registers.PC & 0xFF00) !== (old_pc & 0xFF00)){
+                this.extraCycles++;
+            }
+        }
     };
 
     w.JNE.NES6502 = NES6502;
