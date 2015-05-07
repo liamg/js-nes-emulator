@@ -704,6 +704,47 @@ QUnit.test("Invalid opcode definition check", function( assert ) {
     );
 });
 
+QUnit.test("Stack operations", function( assert ) {
+
+    cpu.push(0x01);
+    assert.equal(cpu.mmc.fetch(0x1ff), 0x01, 'First stack push writes to 0x1ff');
+
+    cpu.push(0x02);
+    assert.equal(cpu.mmc.fetch(0x1fe), 0x02, 'Stack pointer decrements on push so second push writes to 0x1fe');
+
+    cpu.registers.SP = 0x100;
+    cpu.push(0x03);
+    cpu.push(0x04);
+    assert.equal(cpu.mmc.fetch(0x1ff), 0x04, 'Stack overflow results in wrap around so decrementing from 0x100 results in next value being pushed to 0x1ff');
+
+
+    cpu.reset();
+
+    cpu.push(0x01);
+    assert.equal(cpu.pop(), 0x01, 'Value pushed to stack can be popped back off');
+
+    cpu.push(0x01);
+    cpu.push(0x02);
+    cpu.push(0x03);
+    assert.equal(cpu.pop(), 0x03, 'Values pushed to stack are popped back off in FILO order');
+    assert.equal(cpu.pop(), 0x02, 'Values pushed to stack are popped back off in FILO order');
+    assert.equal(cpu.pop(), 0x01, 'Values pushed to stack are popped back off in FILO order');
+
+    assert.equal(cpu.pop(), 0x00, 'Stack underflow results in wrap around so 0x100 is read after 0x1ff');
+    assert.equal(cpu.registers.SP, 0x100, 'Stack underflow results in wrap around so 0x100 is read after 0x1ff');
+
+
+    cpu.reset();
+    cpu.push(0x7);
+    cpu.push(0x8);
+    cpu.push(0x9);
+    var pre_peek_sp = cpu.registers.SP;
+    assert.equal(cpu.peek(), 0x9, 'Stack peek returns most recently pushed value');
+    assert.equal(cpu.registers.SP, pre_peek_sp, 'Stack peek does not modify stack pointer register');
+
+});
+
+
 QUnit.test("LDA #", function( assert ) {
 
     mmc.store(0x200, 0xA9);

@@ -58,6 +58,8 @@
         this.flags.zero = 1;
         this.flags.carry = 0;
         this.flags.negative = 0;
+
+        mmc.reset();
     };
 
     /**
@@ -438,6 +440,21 @@
             value: value
         };
 
+    };
+
+    NES6502.prototype.push = function(value){
+        // Stack lives at $0100 - $01ff. First value lives at 0x1ff
+        this.mmc.store(this.registers.SP, value);
+        this.registers.SP = (--this.registers.SP & 0xFF) + 0x100; // wrap around stack for mario hax
+    };
+
+    NES6502.prototype.pop = function(){
+        this.registers.SP = (++this.registers.SP & 0xFF) + 0x100; // wrap around stack
+        return this.mmc.fetch(this.registers.SP);
+    };
+
+    NES6502.prototype.peek = function(){
+        return this.mmc.fetch(((this.registers.SP + 1) & 0xFF) + 0x100);
     };
 
     // http://www.obelisk.demon.co.uk/6502/reference.html#LDA
