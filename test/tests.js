@@ -167,7 +167,7 @@ QUnit.test("Initialises registers/flags", function( assert ) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is initialised to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is initialised to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is initialised to 0x07FF');
-    assert.equal(cpu.registers.P, 0, 'Register P is initialised to 0x00');
+    assert.equal(cpu.registers.P, 0x2, 'Register P is initialised to 0x00');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -191,7 +191,7 @@ QUnit.test("Reset state", function( assert ) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is reset to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is reset to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is reset to 0x07FF');
-    assert.equal(cpu.registers.P, 0, 'Register P is reset to 0x00');
+    assert.equal(cpu.registers.P, 0x2, 'Register P is reset to 0x00');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -704,6 +704,42 @@ QUnit.test("Invalid opcode definition check", function( assert ) {
     );
 });
 
+QUnit.test("Flag functions set/clear flags as required", function( assert ) {
+
+    var flags = ['Carry', 'Zero', 'InterruptDisable', 'Decimal', 'Brk', 'Unused', 'Overflow', 'Negative'];
+
+    var expectedClear, camel;
+
+    for(var i in flags){
+
+        if(!flags.hasOwnProperty(i)) continue;
+
+        var flagValue = Math.pow(2, parseInt(i, 10));
+
+        cpu.reset();
+
+        if(flags[i] == 'Zero'){
+            expectedClear = 0x0;
+        }else {
+            expectedClear = 0x2;
+        }
+
+        camel = flags[i].substring(0, 1).toLowerCase() + flags[i].substring(1);
+
+        cpu['set' + flags[i] + 'Flag']();
+        assert.equal(cpu.flags[camel], 1, flags[i] + ' flag is set');
+        assert.equal(cpu.registers.P & flagValue, flagValue, flags[i] + ' flag is set in the P register');
+        assert.equal(cpu.registers.P, flagValue | expectedClear, flags[i] + ' flag is set in the P register without affecting other flags');
+
+        cpu['clear' + flags[i] + 'Flag']();
+        assert.equal(cpu.flags[camel], 0, flags[i] + ' flag is cleared');
+        assert.equal(cpu.registers.P & flagValue, 0, flags[i] + ' flag is clear in the P register');
+        assert.equal(cpu.registers.P, expectedClear, flags[i] + ' flag is clear in the P register without affecting other flags');
+
+    }
+
+});
+
 QUnit.test("Stack operations", function( assert ) {
 
     cpu.push(0x01);
@@ -829,7 +865,7 @@ QUnit.test("NOP", function( assert ) {
 
 QUnit.test("ADC #", function( assert ) {
 
-    cpu.registers.A = 0x02;
+    cpu.registers.A = 0x80;
 
     mmc.store(0x200, 0x69); // ADC
     mmc.store(0x201, 0x01); // #3
@@ -839,8 +875,10 @@ QUnit.test("ADC #", function( assert ) {
     var cycles = cpu.execute();
 
     assert.equal(cycles, 2, 'ADC # takes 2 cycles');
-    assert.equal(cpu.registers.A, 0x03, '"A" register has value 0x03 stored');
+    assert.equal(cpu.registers.A, 0x81, '"A" register has value 0x81 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is not set');
 
     cpu.reset();
 
@@ -860,6 +898,8 @@ QUnit.test("ADC #", function( assert ) {
     assert.equal(cycles, 2, 'ADC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is not set');
 
 
     cpu.reset();
@@ -881,6 +921,8 @@ QUnit.test("ADC #", function( assert ) {
     assert.equal(cpu.registers.A, 0x01, '"A" register has value 0x01 stored');
     assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when adding 0xff + 0x1');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for ADC #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is not set');
 
     cycles = cpu.execute();
 
@@ -888,8 +930,41 @@ QUnit.test("ADC #", function( assert ) {
     assert.equal(cpu.registers.A, 0x02, '"A" register has value 0x02 stored');
     assert.equal(cpu.flags.carry, 0x0, 'Carry flag is set when adding 0xff + 0x1');
     assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice further for additonal ADC #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is not set');
 
+    cpu.reset();
 
+    // test overflow flag
+
+    cpu.registers.A = 0x50;
+    cpu.registers.PC = 0x200;
+
+    mmc.store(0x200, 0x69); // ADC
+    mmc.store(0x201, 0x50); // #$ff
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
+    assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set');
+    assert.equal(cpu.registers.A, 0xa0, '0x50 ADC 0x50 = 0xa0');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear');
+
+    // test zero flag
+
+    cpu.reset();
+
+    cpu.registers.A = 0x00;
+    cpu.registers.PC = 0x200;
+
+    mmc.store(0x200, 0x69); // ADC
+    mmc.store(0x201, 0x00); // #$2
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
+    assert.equal(cpu.registers.A, 0x0, 'A is set to zero');
 
 });
 
@@ -916,16 +991,16 @@ QUnit.test("AND #", function( assert ) {
     cpu.registers.A = 0xff;
 
     mmc.store(0x200, 0x29); // AND
-    mmc.store(0x201, 0x47); // #$47
+    mmc.store(0x201, 0x80); // #$80
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 2, 'AND # takes 2 cycles');
-    assert.equal(cpu.registers.A, 0x47, '"A" register has value 0x00 stored');
+    assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for AND #');
-    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is not set');
 
 
@@ -947,6 +1022,7 @@ QUnit.test("ASL", function( assert ) {
     assert.equal(cpu.registers.PC, 0x201, 'Program counter is incremented once for ASL A');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is not set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is not set');
 
 
     cpu.reset();
@@ -965,6 +1041,41 @@ QUnit.test("ASL", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Program counter is incremented 3 times for ASL a');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is not set');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x0A); // ASL A
+
+    cpu.registers.PC = 0x200;
+
+    cpu.registers.A = 0x40;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ASL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored');
+    assert.equal(cpu.registers.PC, 0x201, 'Program counter is incremented once for ASL A');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is not set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is not set');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x0A); // ASL A
+
+    cpu.registers.PC = 0x200;
+
+    cpu.registers.A = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ASL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x80 stored');
+    assert.equal(cpu.registers.PC, 0x201, 'Program counter is incremented once for ASL A');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set');
 
 
 });
@@ -1302,3 +1413,29 @@ QUnit.test("BPL r", function( assert ) {
     assert.equal(cycles, 3, 'Successful BPL r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if negative is clear');
 });
+
+QUnit.test("BRK", function( assert ) {
+
+    cpu.flags.negative = 1;
+
+    mmc.store(0x200, 0x00); // BRK
+    mmc.store(0xFFFE, 0x02);
+    mmc.store(0xFFFF, 0x01);
+
+    cpu.registers.PC = 0x200;
+
+    var initialP = cpu.registers.P;
+
+    var initialPC = cpu.registers.PC + 2;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 7, 'BRK takes 7 cycles');
+    assert.equal(cpu.flags.brk, 1, 'BRK flag is set');
+    assert.equal(cpu.pop(), initialP, 'P was pushed to stack');
+    assert.equal(cpu.pop(), (initialPC & 0xff) , 'PC[low] was pushed to stack');
+    assert.equal(cpu.pop(), ((initialPC >> 8) & 0xff), 'PC[high] was pushed to stack');
+    assert.equal(cpu.registers.PC, 0x102, 'PC was set from 0xFFFE-0xFFFF to 0x102');
+
+});
+

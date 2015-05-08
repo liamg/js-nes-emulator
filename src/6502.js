@@ -1,6 +1,18 @@
 /**
  * A simulation of the 6502 CPU (without decimal support).
+ *
+ * Useful links:
+ *
+ * 6502 Overview
  * http://en.wikipedia.org/wiki/MOS_Technology_6502
+ *
+ * Online emulator with debug mode
+ * http://skilldrick.github.io/easy6502/
+ *
+ * CPU Docs
+ * http://www.llx.com/~nparker/a2/opcodes.html
+ * http://www.obelisk.demon.co.uk/6502/reference.html#LDA
+ * http://www.6502.org/tutorials/65c02opcodes.html
  */
 (function(w) {
     "use strict";
@@ -27,7 +39,12 @@
         this.flags = {
             carry: 0,
             zero: 0,
-            negative: 0
+            negative: 0,
+            interruptDisable: 0,
+            decimal: 0, //not supported by this version
+            brk: 0,
+            overflow: 0,
+            unused: 0
         };
 
         this.reset();
@@ -55,11 +72,115 @@
         this.registers.PC = 0x07FF;
         this.registers.P = 0;
 
+        //@todo: replace with calls to set/clear functions
         this.flags.zero = 1;
         this.flags.carry = 0;
         this.flags.negative = 0;
+        this.flags.interruptDisable = 0;
+        this.flags.decimal = 0;
+        this.flags.brk = 0;
+        this.flags.overflow = 0;
+        this.flags.unused = 0;
+
+        this.determineStatus();
 
         mmc.reset();
+    };
+
+    // @todo tests
+
+    /**
+     * Determine and set the CPU status (P register) from the individual bit flags
+     */
+    NES6502.prototype.determineStatus = function(){
+        this.registers.P = (this.flags.carry |
+        (this.flags.zero << 1) |
+        (this.flags.interruptDisable << 2) |
+        (this.flags.decimal << 3)|
+        (this.flags.brk << 4)|
+        (this.flags.unused << 5)|
+        (this.flags.overflow << 6)|
+        (this.flags.negative << 7)) & 0xff;
+    };
+
+    NES6502.prototype.setCarryFlag = function(){
+        this.flags.carry = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearCarryFlag = function(){
+        this.flags.carry = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setUnusedFlag = function(){
+        this.flags.unused = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearUnusedFlag = function(){
+        this.flags.unused = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setZeroFlag = function(){
+        this.flags.zero = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearZeroFlag = function(){
+        this.flags.zero = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setInterruptDisableFlag = function(){
+        this.flags.interruptDisable = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearInterruptDisableFlag = function(){
+        this.flags.interruptDisable = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setDecimalFlag = function(){
+        this.flags.decimal = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearDecimalFlag = function(){
+        this.flags.decimal = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setBrkFlag = function(){
+        this.flags.brk = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearBrkFlag = function(){
+        this.flags.brk = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setOverflowFlag = function(){
+        this.flags.overflow = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearOverflowFlag = function(){
+        this.flags.overflow = 0;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.setNegativeFlag = function(){
+        this.flags.negative = 1;
+        this.determineStatus();
+    };
+
+    NES6502.prototype.clearNegativeFlag = function(){
+        this.flags.negative = 0;
+        this.determineStatus();
     };
 
     /**
@@ -156,15 +277,8 @@
         NOP: 56
     };
 
-    /**
-     * Read this:
-     * http://www.llx.com/~nparker/a2/opcodes.html
-     * http://www.obelisk.demon.co.uk/6502/reference.html#LDA
-     * http://www.6502.org/tutorials/65c02opcodes.html
-    */
-
     NES6502.prototype.instruction_table = [];
-    NES6502.prototype.instruction_table[0x0] = [NES6502.prototype.opcodes.BRK, NES6502.prototype.addressModes.IMPLICIT];
+    NES6502.prototype.instruction_table[0x0] = [NES6502.prototype.opcodes.BRK, NES6502.prototype.addressModes.IMPLICIT, 7];
     NES6502.prototype.instruction_table[0x1] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.INDEXED_INDIRECT];
     NES6502.prototype.instruction_table[0x5] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.ZERO_PAGE];
     NES6502.prototype.instruction_table[0x6] = [NES6502.prototype.opcodes.ASL, NES6502.prototype.addressModes.ZERO_PAGE, 5];
@@ -461,10 +575,21 @@
     NES6502.prototype.operations = [];
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.LDA] = function(addressMode) {
+
         var value = this.readMemory(addressMode).value;
         this.registers.A = value;
-        this.flags.zero = this.registers.A === 0 ? 1 : 0;
-        this.flags.negative = this.registers.A & 0x80 ? 1 : 0;
+
+        if(this.registers.A === 0){
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
+
+        if(this.registers.A & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.NOP] = function(addressMode) {
@@ -476,10 +601,34 @@
         var mem = this.readMemory(addressMode).value;
 
         var tmp = this.registers.A + mem + this.flags.carry;
-        this.flags.overflow = ((this.registers.A ^ mem) & 0x80) === 0 && ((this.registers.A ^ tmp) & 0x80) !== 0 ? 1 : 0;
-        this.flags.carry = tmp > 0xff ? 1 : 0;
-        this.flags.negative = tmp & 0x80 ? 1 : 0;
-        this.flags.zero = this.registers.A === 0;
+
+        /**
+         * http://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
+         */
+        if(((this.registers.A ^ mem) & 0x80) === 0 && ((this.registers.A ^ tmp) & 0x80) !== 0){
+            this.setOverflowFlag();
+        }else{
+            this.clearOverflowFlag();
+        }
+
+        if(tmp > 0xff){
+            this.setCarryFlag();
+        }else{
+            this.clearCarryFlag();
+        }
+
+        if(tmp & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
+
+        if(this.registers.A === 0) {
+            this.setZeroFlag();
+        }else {
+            this.clearZeroFlag();
+        }
+
         this.registers.A = tmp & 0xff;
 
     };
@@ -487,8 +636,18 @@
     NES6502.prototype.operations[NES6502.prototype.opcodes.AND] = function(addressMode) {
 
         this.registers.A = this.readMemory(addressMode).value & this.registers.A;
-        this.flags.negative = this.registers.A & 0x80 ? 1 : 0;
-        this.flags.zero = this.registers.A === 0;
+
+        if(this.registers.A & 0x80){
+            this.setNegativeFlag();
+        }else {
+            this.clearNegativeFlag();
+        }
+
+        if(this.registers.A === 0) {
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
 
     };
 
@@ -505,9 +664,23 @@
             this.mmc.store(mem.address, tmp & 0xff);
         }
 
-        this.flags.carry = tmp > 0xff ? 1 : 0;
-        this.flags.negative = tmp & 0x80 ? 1 : 0;
-        this.flags.zero = this.registers.A === 0 ? 1 : 0;
+        if(tmp > 0xff){
+            this.setCarryFlag();
+        }else{
+            this.clearCarryFlag();
+        }
+
+        if(tmp & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
+
+        if(this.registers.A === 0){
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
 
     };
 
@@ -559,9 +732,24 @@
     NES6502.prototype.operations[NES6502.prototype.opcodes.BIT] = function(addressMode) {
 
         var mem = this.readMemory(addressMode);
-        this.flags.negative = (mem.value >> 7) & 1; // 10000000
-        this.flags.overflow = (mem.value >> 6) & 1; // 01000000
-        this.flags.zero = (this.registers.A & mem.value) > 0 ? 0 : 1;
+
+        if((mem.value >> 7) & 1){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
+
+        if((mem.value >> 6) & 1) {
+            this.setOverflowFlag();
+        }else{
+            this.clearOverflowFlag();
+        }
+
+        if((this.registers.A & mem.value) > 0){
+            this.clearZeroFlag();
+        }else{
+            this.setZeroFlag();
+        }
 
     };
 
@@ -630,6 +818,27 @@
                 this.extraCycles++;
             }
         }
+    };
+
+    /**
+     * The BRK instruction forces the generation of an interrupt request.
+     * The program counter and processor status are pushed on the stack then the IRQ interrupt vector at $FFFE/F is
+     * loaded into the PC and the break flag in the status set to one.
+     *
+     * @param addressMode Memory addressing mode
+     */
+    NES6502.prototype.operations[NES6502.prototype.opcodes.BRK] = function(addressMode) {
+
+        this.registers.PC++;
+
+        this.push( (this.registers.PC >> 8) & 0xff );
+        this.push( this.registers.PC & 0xff );
+
+        this.push(this.registers.P);
+
+        this.setBrkFlag();
+
+        this.registers.PC = mmc.fetch(0xFFFE) | (mmc.fetch(0xFFFF) << 8);
     };
 
     w.JNE.NES6502 = NES6502;
