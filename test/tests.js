@@ -60,6 +60,9 @@ QUnit.test("MMC stores values in memory", function( assert ) {
     testStore(mmc.memory.length-1, 0x00);
     testStore(mmc.memory.length-1, 0x07);
 
+    mmc.store(0x200, 0x1001);
+    assert.equal(mmc.memory[0x200], 0x1, 'Values greater than 0xff are ANDed to a single byte');
+
     assert.throws(
         function(){
             mmc.store(mmc.memory.length, 0x00);

@@ -72,22 +72,19 @@
         this.registers.PC = 0x07FF;
         this.registers.P = 0;
 
-        //@todo: replace with calls to set/clear functions
-        this.flags.zero = 1;
-        this.flags.carry = 0;
-        this.flags.negative = 0;
-        this.flags.interruptDisable = 0;
-        this.flags.decimal = 0;
-        this.flags.brk = 0;
-        this.flags.overflow = 0;
-        this.flags.unused = 0;
+        this.setZeroFlag();
+        this.clearCarryFlag();
+        this.clearNegativeFlag();
+        this.clearInterruptDisableFlag();
+        this.clearDecimalFlag();
+        this.clearBrkFlag();
+        this.clearOverflowFlag();
+        this.clearUnusedFlag();
 
         this.determineStatus();
 
         mmc.reset();
     };
-
-    // @todo tests
 
     /**
      * Determine and set the CPU status (P register) from the individual bit flags
