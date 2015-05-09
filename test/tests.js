@@ -2348,5 +2348,49 @@ QUnit.test("NOP", function (assert) {
     assert.equal(postState_memory, preState_memory, 'CPU memory state is unchanged on NOP');
 });
 
+QUnit.test("ORA #", function (assert) {
 
+    mmc.store(0x200, 0x09); // ORA
+    mmc.store(0x201, 0x15); // 00010101
 
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0x40; // 01000000
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ORA # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x55, 'ORA 0x15 0x15 results in 0x55');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when ORA result is not zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when ORA result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x09); // ORA
+    mmc.store(0x201, 0x00); // 00000000
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0x00; // 00000000
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ORA # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, 'ORA 0x0 0x0 results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when ORA result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when ORA result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x09); // ORA
+    mmc.store(0x201, 0x80); // 10000000
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0x01; // 00000001
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ORA # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x81, 'ORA 0x80 0x01 results in 0x81');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when ORA result is not zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when ORA result is negative');
+
+});
