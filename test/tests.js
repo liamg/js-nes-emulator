@@ -479,10 +479,8 @@ QUnit.test("Instruction table contains valid instructions", function( assert ) {
                                 result.operation = cpu.opcodes.BIT;
                                 break;
                             case 2:
-                                result.operation = cpu.opcodes.JMP;
-                                break;
                             case 3:
-                                result.operation = cpu.opcodes.JMP_ABS;
+                                result.operation = cpu.opcodes.JMP;
                                 break;
                             case 4:
                                 result.operation = cpu.opcodes.STY;
@@ -2092,5 +2090,21 @@ QUnit.test("INY", function( assert ) {
     assert.equal(cpu.registers.Y, 0xff, 'INY on 0x0 results is 0xff');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INY result is non-zero');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INY result is negative');
+
+});
+
+QUnit.test("JMP", function( assert ) {
+
+    mmc.store(0x200, 0x4C); // JMP a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x09);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'JMP a takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'JMP results in PC being set to JMP arg');
 
 });
