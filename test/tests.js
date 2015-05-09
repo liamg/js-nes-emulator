@@ -707,6 +707,23 @@ QUnit.test("Invalid opcode definition check", function( assert ) {
     );
 });
 
+QUnit.test("Missing function for opcode check", function( assert ) {
+
+    mmc.store(0x200, 0xc2);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.instruction_table[0xc2] = [0,0,0];
+
+    assert.throws(
+        function(){
+            cpu.execute();
+        },
+        /Operation exists in instruction table but is not defined: 0xc2/,
+        'Error thrown on missing opcode function'
+    );
+});
+
 QUnit.test("Flag functions set/clear flags as required", function( assert ) {
 
     var flags = ['Carry', 'Zero', 'InterruptDisable', 'Decimal', 'Brk', 'Unused', 'Overflow', 'Negative'];
