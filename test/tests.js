@@ -1893,3 +1893,63 @@ QUnit.test("INC a", function( assert ) {
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is zero');
 
 });
+
+QUnit.test("DEX", function( assert ) {
+
+    mmc.store(0x200, 0xCA); // DEX
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.X = 0x01;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'DEX takes " cycles');
+    assert.equal(cpu.registers.X, 0x0, 'DEX on 0x1 results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEX result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEX result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xCA); // DEX
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.X = 0x00;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'DEX takes " cycles');
+    assert.equal(cpu.registers.X, 0xff, 'DEX on 0x0 results in 0xff (-1)');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEX result is non-zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEX result is negative');
+
+});
+
+QUnit.test("DEY", function( assert ) {
+
+    mmc.store(0x200, 0x88); // DEY
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.Y = 0x01;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'DEY takes " cycles');
+    assert.equal(cpu.registers.Y, 0x0, 'DEY on 0x1 results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEY result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEY result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x88); // DEY
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.Y = 0x00;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'DEY takes " cycles');
+    assert.equal(cpu.registers.Y, 0xff, 'DEY on 0x0 results in 0xff (-1)');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEY result is non-zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEY result is negative');
+
+});

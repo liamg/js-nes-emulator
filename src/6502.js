@@ -365,7 +365,7 @@
     NES6502.prototype.instruction_table[0x84] = [NES6502.prototype.opcodes.STY, NES6502.prototype.addressModes.ZERO_PAGE];
     NES6502.prototype.instruction_table[0x85] = [NES6502.prototype.opcodes.STA, NES6502.prototype.addressModes.ZERO_PAGE];
     NES6502.prototype.instruction_table[0x86] = [NES6502.prototype.opcodes.STX, NES6502.prototype.addressModes.ZERO_PAGE];
-    NES6502.prototype.instruction_table[0x88] = [NES6502.prototype.opcodes.DEY, NES6502.prototype.addressModes.IMPLICIT];
+    NES6502.prototype.instruction_table[0x88] = [NES6502.prototype.opcodes.DEY, NES6502.prototype.addressModes.IMPLICIT, 2];
     NES6502.prototype.instruction_table[0x89] = [NES6502.prototype.opcodes.STA, NES6502.prototype.addressModes.IMMEDIATE];
     NES6502.prototype.instruction_table[0x8a] = [NES6502.prototype.opcodes.TXA, NES6502.prototype.addressModes.IMPLICIT];
     NES6502.prototype.instruction_table[0x8c] = [NES6502.prototype.opcodes.STY, NES6502.prototype.addressModes.ABSOLUTE];
@@ -412,7 +412,7 @@
     NES6502.prototype.instruction_table[0xc6] = [NES6502.prototype.opcodes.DEC, NES6502.prototype.addressModes.ZERO_PAGE, 5];
     NES6502.prototype.instruction_table[0xc8] = [NES6502.prototype.opcodes.INY, NES6502.prototype.addressModes.IMPLICIT];
     NES6502.prototype.instruction_table[0xc9] = [NES6502.prototype.opcodes.CMP, NES6502.prototype.addressModes.IMMEDIATE, 2];
-    NES6502.prototype.instruction_table[0xca] = [NES6502.prototype.opcodes.DEX, NES6502.prototype.addressModes.IMPLICIT];
+    NES6502.prototype.instruction_table[0xca] = [NES6502.prototype.opcodes.DEX, NES6502.prototype.addressModes.IMPLICIT, 2];
     NES6502.prototype.instruction_table[0xcc] = [NES6502.prototype.opcodes.CPY, NES6502.prototype.addressModes.ABSOLUTE, 4];
     NES6502.prototype.instruction_table[0xcd] = [NES6502.prototype.opcodes.CMP, NES6502.prototype.addressModes.ABSOLUTE, 4];
     NES6502.prototype.instruction_table[0xce] = [NES6502.prototype.opcodes.DEC, NES6502.prototype.addressModes.ABSOLUTE, 6];
@@ -995,6 +995,40 @@
         }
 
         this.mmc.store(m.address, r);
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.DEX] = function(addressMode) {
+
+        this.registers.X = (this.registers.X - 1) & 0xff;
+
+        if(this.registers.X === 0){
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
+
+        if(this.registers.X & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.DEY] = function(addressMode) {
+
+        this.registers.Y = (this.registers.Y - 1) & 0xff;
+
+        if(this.registers.Y === 0){
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
+
+        if(this.registers.Y & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
     };
 
     w.JNE.NES6502 = NES6502;
