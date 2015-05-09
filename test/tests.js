@@ -2467,3 +2467,271 @@ QUnit.test("PLP", function (assert) {
     assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set when PLP pulls 0xff from stack');
 
 });
+
+QUnit.test("ROL A", function (assert) {
+
+    mmc.store(0x200, 0x2a);
+
+    cpu.registers.A = 0x08;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x10, '"A" register has value 0x10 stored after ROL of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2a);
+
+    cpu.registers.A = 0x80;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after ROL of 0x80');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROL of 0x80');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after ROL of 0x80');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2a);
+
+    cpu.registers.A = 0x40;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored after ROL of 0x40');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROL 0x40');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x40');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x40');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2a);
+
+    cpu.setCarryFlag();
+    cpu.registers.A = 0x0;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROL A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x01, '"A" register has value 0x01 stored after ROL of 0x0 with carry set');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL 0x0 with carry set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x0 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x0 with carry set');
+});
+
+QUnit.test("ROL a", function (assert) {
+
+    mmc.store(0x200, 0x2e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x08);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROL a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x10, 'Memory has value 0x10 stored after ROL of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x80);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROL a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after ROL of 0x80');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROL of 0x80');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after ROL of 0x80');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x40);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROL a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x80, 'Memory has value 0x80 stored after ROL of 0x40');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROL 0x40');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x40');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x40');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x2e);
+
+    cpu.setCarryFlag();
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x0);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROL a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x01, 'Memory has value 0x01 stored after ROL of 0x0 with carry set');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROL 0x0 with carry set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROL of 0x0 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROL of 0x0 with carry set');
+});
+
+QUnit.test("ROR A", function (assert) {
+
+    mmc.store(0x200, 0x6a);
+
+    cpu.registers.A = 0x08;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored after ROR of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROR');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROR of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6a);
+
+    cpu.registers.A = 0x1;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after ROR of 0x1');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROR');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROR of 0x1');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after ROR of 0x1');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6a);
+
+    cpu.setCarryFlag();
+    cpu.registers.A = 0x2;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x81, '"A" register has value 0x81 stored after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x2 with carry set');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6a);
+
+    cpu.setCarryFlag();
+    cpu.registers.A = 0x1;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'ROR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x1 with carry set');
+});
+
+QUnit.test("ROR a", function (assert) {
+
+    mmc.store(0x200, 0x6e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x08);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROR a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x04, '"A" register has value 0x04 stored after ROR of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROR');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROR of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x1);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROR a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0, '"A" register has value 0x0 stored after ROR of 0x1');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after ROR');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROR of 0x1');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after ROR of 0x1');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x02);
+
+    cpu.setCarryFlag();
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROR a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x81, '"A" register has value 0x81 stored after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after ROR of 0x2 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x2 with carry set');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x6e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+
+    cpu.setCarryFlag();
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'ROR a takes 6 cycles');
+    assert.equal(cpu.mmc.fetch(0x203), 0x80, '"A" register has value 0x80 stored after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after ROR of 0x1 with carry set');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x1 with carry set');
+});
+
