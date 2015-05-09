@@ -844,89 +844,6 @@ QUnit.test("Stack operations", function (assert) {
 
 });
 
-
-QUnit.test("LDA #", function (assert) {
-
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x07);
-
-    cpu.registers.PC = 0x200;
-
-    var cycles = cpu.execute();
-
-    assert.equal(cycles, 2, 'LDA # takes 2 cycles');
-    assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
-    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x8);
-    mmc.store(0x202, 0xA9);
-    mmc.store(0x203, 0xf);
-    mmc.store(0x204, 0xA9);
-    mmc.store(0x205, 0x00);
-
-    cpu.registers.PC = 0x200;
-
-    cpu.execute();
-    assert.equal(cpu.registers.A, 0x08, '"A" register has value 0x08 stored');
-    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
-    cpu.execute();
-    assert.equal(cpu.registers.A, 0x0f, '"A" register has value 0x0f stored');
-    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDA #');
-    cpu.execute();
-    assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
-    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDA #');
-
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x00);
-
-    cpu.registers.PC = 0x200;
-
-    cpu.execute();
-
-    assert.equal(cpu.flags.zero, 1, 'LDA #0 results in zero flag being set');
-    assert.equal(cpu.flags.negative, 0, 'LDA #0 results in negative flag being unset');
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x07);
-
-    cpu.registers.PC = 0x200;
-
-    cpu.execute();
-
-    assert.equal(cpu.flags.zero, 0, 'LDA #7 results in zero flag being unset');
-    assert.equal(cpu.flags.negative, 0, 'LDA #7 results in negative flag being unset');
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x81);
-
-    cpu.registers.PC = 0x200;
-
-    cpu.execute();
-
-    assert.equal(cpu.flags.zero, 0, 'LDA #81 results in zero flag being unset');
-    assert.equal(cpu.flags.negative, 1, 'LDA #81 results in negative flag being set');
-
-});
-
-QUnit.test("NOP", function (assert) {
-
-    mmc.store(0x200, 0xEA);
-    cpu.registers.PC = 0x200;
-
-    assert.equal(cpu.execute(), 2, 'NOP takes 2 cycles');
-
-});
-
 QUnit.test("ADC #", function (assert) {
 
     cpu.registers.A = 0x80;
@@ -1905,56 +1822,6 @@ QUnit.test("DEC a", function (assert) {
 
 });
 
-QUnit.test("INC a", function (assert) {
-
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x09);
-
-    cpu.registers.PC = 0x200;
-
-    var cycles = cpu.execute();
-
-    assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
-    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is non zero');
-    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is positive');
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x80);
-
-    cpu.registers.PC = 0x200;
-
-    cycles = cpu.execute();
-
-    assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
-    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is negative');
-    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INC a result is negative');
-
-    cpu.reset();
-
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0xff);
-
-    cpu.registers.PC = 0x200;
-
-    cycles = cpu.execute();
-
-    assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
-    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INC a result is zero');
-    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is zero');
-
-});
-
 QUnit.test("DEX", function (assert) {
 
     mmc.store(0x200, 0xCA); // DEX
@@ -2029,6 +1896,56 @@ QUnit.test("EOR #", function (assert) {
     assert.equal(cpu.registers.A, 0x0, 'EOR 0x15 0x15 results in 0x0');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when EOR result is zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when EOR result is positive');
+});
+
+QUnit.test("INC a", function (assert) {
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x09);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x80);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is negative');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INC a result is negative');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0xff);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INC a result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is zero');
+
 });
 
 QUnit.test("INX", function (assert) {
@@ -2123,3 +2040,313 @@ QUnit.test("JSR a", function (assert) {
     assert.equal(cpu.pop(), 0x02, 'JSR results PC return address being pushed to the stack');
 
 });
+
+QUnit.test("LDA #", function (assert) {
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'LDA # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x8);
+    mmc.store(0x202, 0xA9);
+    mmc.store(0x203, 0xf);
+    mmc.store(0x204, 0xA9);
+    mmc.store(0x205, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+    assert.equal(cpu.registers.A, 0x08, '"A" register has value 0x08 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
+    cpu.execute();
+    assert.equal(cpu.registers.A, 0x0f, '"A" register has value 0x0f stored');
+    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDA #');
+    cpu.execute();
+    assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
+    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDA #');
+
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 1, 'LDA #0 results in zero flag being set');
+    assert.equal(cpu.flags.negative, 0, 'LDA #0 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDA #7 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 0, 'LDA #7 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA9);
+    mmc.store(0x201, 0x81);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDA #81 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 1, 'LDA #81 results in negative flag being set');
+
+});
+
+QUnit.test("LDX #", function (assert) {
+
+    mmc.store(0x200, 0xA2);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'LDX # takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x07, '"X" register has value 0x07 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDX #');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA2);
+    mmc.store(0x201, 0x8);
+    mmc.store(0x202, 0xA2);
+    mmc.store(0x203, 0xf);
+    mmc.store(0x204, 0xA2);
+    mmc.store(0x205, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+    assert.equal(cpu.registers.X, 0x08, '"X" register has value 0x08 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDX #');
+    cpu.execute();
+    assert.equal(cpu.registers.X, 0x0f, '"X" register has value 0x0f stored');
+    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDX #');
+    cpu.execute();
+    assert.equal(cpu.registers.X, 0x00, '"X" register has value 0x00 stored');
+    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDX #');
+
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA2);
+    mmc.store(0x201, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 1, 'LDX #0 results in zero flag being set');
+    assert.equal(cpu.flags.negative, 0, 'LDX #0 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA2);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDX #7 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 0, 'LDX #7 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA2);
+    mmc.store(0x201, 0x81);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDX #81 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 1, 'LDX #81 results in negative flag being set');
+
+});
+
+QUnit.test("LDY #", function (assert) {
+
+    mmc.store(0x200, 0xA0);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'LDY # takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0x07, '"A" register has value 0x07 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDY #');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA0);
+    mmc.store(0x201, 0x8);
+    mmc.store(0x202, 0xA0);
+    mmc.store(0x203, 0xf);
+    mmc.store(0x204, 0xA0);
+    mmc.store(0x205, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+    assert.equal(cpu.registers.Y, 0x08, '"A" register has value 0x08 stored');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDY #');
+    cpu.execute();
+    assert.equal(cpu.registers.Y, 0x0f, '"A" register has value 0x0f stored');
+    assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDY #');
+    cpu.execute();
+    assert.equal(cpu.registers.Y, 0x00, '"A" register has value 0x00 stored');
+    assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDY #');
+
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA0);
+    mmc.store(0x201, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 1, 'LDY #0 results in zero flag being set');
+    assert.equal(cpu.flags.negative, 0, 'LDY #0 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA0);
+    mmc.store(0x201, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDY #7 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 0, 'LDY #7 results in negative flag being unset');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xA0);
+    mmc.store(0x201, 0x81);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.execute();
+
+    assert.equal(cpu.flags.zero, 0, 'LDY #81 results in zero flag being unset');
+    assert.equal(cpu.flags.negative, 1, 'LDY #81 results in negative flag being set');
+
+});
+
+QUnit.test("LSR A", function (assert) {
+
+    mmc.store(0x200, 0x4a);
+
+    cpu.registers.A = 0x08;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'LSR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored after LSR of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after LSR of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after LSR of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x4a);
+
+    cpu.registers.A = 0x01;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'LSR A takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after LSR of 0x01');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after LSR of 0x01');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after LSR of 0x01');
+
+});
+
+QUnit.test("LSR a", function (assert) {
+
+    mmc.store(0x200, 0x4e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x08);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'LSR A takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x04, 'Memory has value 0x04 stored after LSR of 0x08');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after LSR of 0x08');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after LSR of 0x08');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x4e);
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'LSR A takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after LSR of 0x01');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after LSR of 0x01');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after LSR of 0x01');
+});
+
+QUnit.test("NOP", function (assert) {
+
+    mmc.store(0x200, 0xEA);
+    cpu.registers.PC = 0x200;
+
+    var preState_registers = JSON.stringify(cpu.registers);
+    var preState_flags = JSON.stringify(cpu.flags);
+    var preState_memory = JSON.stringify(cpu.mmc.memory);
+
+    assert.equal(cpu.execute(), 2, 'NOP takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'PC is incremented once on NOP');
+
+    cpu.registers.PC = 0x200;
+    var postState_registers = JSON.stringify(cpu.registers);
+    var postState_flags = JSON.stringify(cpu.flags);
+    var postState_memory = JSON.stringify(cpu.mmc.memory);
+    assert.equal(postState_registers, preState_registers, 'CPU register state is unchanged other than increment of PC on NOP');
+    assert.equal(postState_flags, preState_flags, 'CPU flag state is unchanged on NOP');
+    assert.equal(postState_memory, preState_memory, 'CPU memory state is unchanged on NOP');
+});
+
+
+
