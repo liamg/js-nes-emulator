@@ -713,7 +713,7 @@ QUnit.test("Missing function for opcode check", function( assert ) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.instruction_table[0xc2] = [0,0,0];
+    cpu.instruction_table[0xc2] = ['NON-EXISTANT',0,0];
 
     assert.throws(
         function(){

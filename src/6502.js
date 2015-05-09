@@ -51,6 +51,14 @@
 
     };
 
+    NES6502.prototype.CPUError = function(message) {
+        this.name = 'CPUError';
+        this.message = message;
+        this.stack = (new Error()).stack;
+    };
+    NES6502.prototype.CPUError.prototype = new Error();
+    NES6502.prototype.CPUError.prototype.constructor = NES6502.prototype.CPUError;
+
     /**
      * Enumeration of interrupt request types
      */
@@ -574,9 +582,9 @@
                 value = this.mmc.fetch(address);
                 break;
             case this.addressModes.IMPLICIT:
-                throw "Cannot read memory for an implicit addressing mode operation";
+                throw new this.CPUError("Cannot read memory for an implicit addressing mode operation");
             default:
-                throw "Unsupported addressing mode";
+                throw new this.CPUError("Cannot read memory: Unsupported addressing mode");
         }
 
         return {
@@ -609,17 +617,17 @@
         var opcode = this.mmc.fetch(this.registers.PC++);
 
         if(!(opcode in this.instruction_table)){
-            throw "Invalid opcode: 0x" + opcode.toString(16);
+            throw new this.CPUError("Invalid opcode: 0x" + opcode.toString(16));
         }
 
         var instruction = this.instruction_table[opcode];
 
         if(instruction.length != 3){
-            throw "Invalid instruction definition - wrong number of parameters";
+            throw new this.CPUError("Invalid instruction definition - wrong number of parameters");
         }
 
         if(!(instruction[0] in this.operations)){
-            throw "Operation exists in instruction table but is not defined: 0x" + opcode.toString(16);
+            throw new this.CPUError("Operation exists in instruction table but is not defined: 0x" + opcode.toString(16));
         }
 
         this.operations[instruction[0]].apply(this, [instruction[1]]);
