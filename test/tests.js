@@ -2735,3 +2735,44 @@ QUnit.test("ROR a", function (assert) {
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after ROR of 0x1 with carry set');
 });
 
+QUnit.test("RTI", function (assert) {
+
+    mmc.store(0x200, 0x40);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.push(0x04); //return...
+    cpu.push(0x02); //...address
+    cpu.push(0xff); //flags
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'RTI takes 6 cycles');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.unused, 0x1, 'Unused flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.interruptDisable, 0x1, 'IRQ flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.brk, 0x1, 'BRK flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.flags.decimal, 0x1, 'Decimal flag is set after RTI with 0xff stacked last');
+    assert.equal(cpu.registers.PC, 0x204, 'PC is set to 0x204 after RTI with 0x04 then 0x02 stacked before P');
+
+});
+
+
+QUnit.test("RTS", function (assert) {
+
+    mmc.store(0x200, 0x60);
+
+    cpu.registers.PC = 0x200;
+
+    cpu.push(0x04); //return...
+    cpu.push(0x02); //...address
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'RTS takes 6 cycles');
+    assert.equal(cpu.registers.PC, 0x204, 'PC is set to 0x204 after RTS with 0x04 then 0x02 stacked');
+
+});

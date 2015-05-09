@@ -366,7 +366,7 @@
     NES6502.prototype.instruction_table[0x3c] = [NES6502.prototype.opcodes.BIT, NES6502.prototype.addressModes.ABSOLUTE_X, 4];
     NES6502.prototype.instruction_table[0x3d] = [NES6502.prototype.opcodes.AND, NES6502.prototype.addressModes.ABSOLUTE_X, 4];
     NES6502.prototype.instruction_table[0x3e] = [NES6502.prototype.opcodes.ROL, NES6502.prototype.addressModes.ABSOLUTE_X, 7];
-    NES6502.prototype.instruction_table[0x40] = [NES6502.prototype.opcodes.RTI, NES6502.prototype.addressModes.IMPLICIT];
+    NES6502.prototype.instruction_table[0x40] = [NES6502.prototype.opcodes.RTI, NES6502.prototype.addressModes.IMPLICIT, 6];
     NES6502.prototype.instruction_table[0x41] = [NES6502.prototype.opcodes.EOR, NES6502.prototype.addressModes.INDEXED_INDIRECT, 6];
     NES6502.prototype.instruction_table[0x42] = [NES6502.prototype.opcodes.LSR, NES6502.prototype.addressModes.IMMEDIATE];
     NES6502.prototype.instruction_table[0x44] = [NES6502.prototype.opcodes.JMP, NES6502.prototype.addressModes.ZERO_PAGE];
@@ -388,7 +388,7 @@
     NES6502.prototype.instruction_table[0x5c] = [NES6502.prototype.opcodes.JMP, NES6502.prototype.addressModes.ABSOLUTE_X];
     NES6502.prototype.instruction_table[0x5d] = [NES6502.prototype.opcodes.EOR, NES6502.prototype.addressModes.ABSOLUTE_X, 4];
     NES6502.prototype.instruction_table[0x5e] = [NES6502.prototype.opcodes.LSR, NES6502.prototype.addressModes.ABSOLUTE_X, 7];
-    NES6502.prototype.instruction_table[0x60] = [NES6502.prototype.opcodes.RTS, NES6502.prototype.addressModes.IMPLICIT];
+    NES6502.prototype.instruction_table[0x60] = [NES6502.prototype.opcodes.RTS, NES6502.prototype.addressModes.IMPLICIT, 6];
     NES6502.prototype.instruction_table[0x61] = [NES6502.prototype.opcodes.ADC, NES6502.prototype.addressModes.INDEXED_INDIRECT, 6];
     NES6502.prototype.instruction_table[0x64] = [NES6502.prototype.opcodes.JMP, NES6502.prototype.addressModes.ZERO_PAGE];
     NES6502.prototype.instruction_table[0x65] = [NES6502.prototype.opcodes.ADC, NES6502.prototype.addressModes.ZERO_PAGE, 3];
@@ -1091,6 +1091,21 @@
             this.checkZeroFlag(mem.value);
             this.mmc.store(mem.address, mem.value);
         }
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.RTI] = function (addressMode) {
+
+        this.registers.P = this.pop();
+        this.setFlagsFromP();
+        var hiPC = this.pop();
+        var loPC = this.pop();
+        this.registers.PC = (hiPC << 8) | loPC;
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.RTS] = function (addressMode) {
+        var hiPC = this.pop();
+        var loPC = this.pop();
+        this.registers.PC = (hiPC << 8) | loPC;
     };
 
     w.JNE.NES6502 = NES6502;
