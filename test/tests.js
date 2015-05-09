@@ -2862,3 +2862,39 @@ QUnit.test("SBC #", function (assert) {
     assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set after SBC 0xd0 - 0x70');
 });
 
+QUnit.test("SEC", function (assert) {
+
+    mmc.store(0x200, 0x38);
+    cpu.registers.PC = 0x200;
+    cpu.clearCarryFlag();
+    var cycles = cpu.execute();
+
+
+
+    assert.equal(cycles, 2, 'SEC takes 2 cycles');
+    assert.equal(cpu.flags.carry, 0x1, 'SEC sets carry flag');
+});
+
+QUnit.test("SED", function (assert) {
+
+    mmc.store(0x200, 0xF8);
+    cpu.registers.PC = 0x200;
+    cpu.clearDecimalFlag();
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SED takes 2 cycles');
+    assert.equal(cpu.flags.decimal, 0x1, 'SED sets decimal flag');
+});
+
+QUnit.test("SEI", function (assert) {
+
+    mmc.store(0x200, 0x78);
+    cpu.registers.PC = 0x200;
+    cpu.clearInterruptDisableFlag();
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SEI takes 2 cycles');
+    assert.equal(cpu.flags.interruptDisable, 0x1, 'SEI sets IRQ flag');
+});
