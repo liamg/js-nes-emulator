@@ -1535,3 +1535,163 @@ QUnit.test("BVS r", function( assert ) {
     assert.equal(cycles, 3, 'Successful BVS r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is set');
 });
+
+QUnit.test("CLC", function( assert ) {
+
+    cpu.setCarryFlag();
+
+    mmc.store(0x200, 0x18); // CLC +2
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLC takes 2 cycles');
+    assert.equal(cpu.flags.carry, 0x0, 'Set carry flag is cleared on CLC');
+
+    cpu.reset();
+
+    cpu.clearCarryFlag();
+
+    mmc.store(0x200, 0x18); // CLC +2
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLC takes 2 cycles when already clear');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag stays cleared on CLC');
+
+});
+
+QUnit.test("CLD", function( assert ) {
+
+    cpu.setDecimalFlag();
+
+    mmc.store(0x200, 0xD8); // CLD +2
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLD takes 2 cycles');
+    assert.equal(cpu.flags.decimal, 0x0, 'Set decimal flag is cleared on CLD');
+
+    cpu.reset();
+
+    cpu.clearDecimalFlag();
+
+    mmc.store(0x200, 0xD8); // CLC +2
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLD takes 2 cycles when already clear');
+    assert.equal(cpu.flags.decimal, 0x0, 'Decimal flag stays cleared on CLD');
+
+});
+
+QUnit.test("CLI", function( assert ) {
+
+    cpu.setInterruptDisableFlag();
+
+    mmc.store(0x200, 0x58); // CLI +2
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLI takes 2 cycles');
+    assert.equal(cpu.flags.interruptDisable, 0x0, 'Set interrupt disable flag is cleared on CLI');
+
+    cpu.reset();
+
+    cpu.clearInterruptDisableFlag();
+
+    mmc.store(0x200, 0x58); // CLI +2
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLI takes 2 cycles when already clear');
+    assert.equal(cpu.flags.interruptDisable, 0x0, 'Interrupt disable flag stays cleared on CLI');
+
+});
+
+QUnit.test("CLV", function( assert ) {
+
+    cpu.setOverflowFlag();
+
+    mmc.store(0x200, 0xB8); // CLV +2
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLV takes 2 cycles');
+    assert.equal(cpu.flags.overflow, 0x0, 'Set decimal flag is cleared on CLV');
+
+    cpu.reset();
+
+    cpu.clearOverflowFlag();
+
+    mmc.store(0x200, 0xB8); // CLV +2
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CLV takes 2 cycles when already clear');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag stays cleared on CLV');
+
+});
+
+QUnit.test("CMP #", function( assert ) {
+
+    mmc.store(0x200, 0xC9); // CMP $C9
+    mmc.store(0x201, 0x7);
+
+    cpu.registers.A = 0x7;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CMP # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when A==M on CMP');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when A==M on CMP');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A==M on CMP');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xC9); // CMP $C9
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.A = 0x7;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CMP # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A<M on CMP');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear when A<M on CMP');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when A<M on CMP');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xC9); // CMP $C9
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.A = 0x9;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CMP # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A>M on CMP');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when A>M on CMP');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A>M on CMP');
+
+
+});
