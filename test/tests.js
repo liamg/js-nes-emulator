@@ -1439,3 +1439,99 @@ QUnit.test("BRK", function( assert ) {
 
 });
 
+
+QUnit.test("BVC r", function( assert ) {
+
+    cpu.flags.overflow = 1;
+
+    mmc.store(0x200, 0x50); // BCC +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BVC r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if overflow not clear');
+
+    cpu.reset();
+
+    mmc.store(0x2fe, 0x50); // BCC +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BVC r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if overflow not set and multi page');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x50); // BCC +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BVC r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is clear');
+});
+
+QUnit.test("BVS r", function( assert ) {
+
+    mmc.store(0x200, 0x70); // BCS +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x03);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'Unsuccessful BVS r takes 2 cycles');
+    assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if overflow clear');
+
+    cpu.reset();
+
+    cpu.flags.overflow = 1;
+
+    mmc.store(0x2fe, 0x70); // BCS +2
+    mmc.store(0x2ff, 0x01);
+    mmc.store(0x300, 0x02);
+    mmc.store(0x301, 0x01);
+    mmc.store(0x302, 0x04);
+
+    cpu.registers.PC = 0x2fe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'Successful BVS r takes 4 cycles with new page');
+    assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if overflow set and multi page');
+
+    cpu.reset();
+
+    cpu.flags.overflow = 1;
+
+    mmc.store(0x200, 0x70); // BCS +2
+    mmc.store(0x201, 0x01);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+    mmc.store(0x204, 0x07);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 3, 'Successful BVS r takes 3 cycles');
+    assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is set');
+});
