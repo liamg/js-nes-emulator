@@ -2898,3 +2898,45 @@ QUnit.test("SEI", function (assert) {
     assert.equal(cycles, 2, 'SEI takes 2 cycles');
     assert.equal(cpu.flags.interruptDisable, 0x1, 'SEI sets IRQ flag');
 });
+
+QUnit.test("STA a", function (assert) {
+
+    mmc.store(0x600, 0x8D);
+    mmc.store(0x601, 0x03);
+    mmc.store(0x602, 0x06);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x33;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'STA a takes 4 cycles');
+    assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STA a stores value of A in memory');
+});
+
+QUnit.test("STX a", function (assert) {
+
+    mmc.store(0x600, 0x8E);
+    mmc.store(0x601, 0x03);
+    mmc.store(0x602, 0x06);
+    cpu.registers.PC = 0x600;
+    cpu.registers.X = 0x33;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'STX a takes 4 cycles');
+    assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STX a stores value of X in memory');
+});
+
+QUnit.test("STY a", function (assert) {
+
+    mmc.store(0x600, 0x8C);
+    mmc.store(0x601, 0x03);
+    mmc.store(0x602, 0x06);
+    cpu.registers.PC = 0x600;
+    cpu.registers.Y = 0x33;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 4, 'STY a takes 4 cycles');
+    assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STY a stores value of Y in memory');
+});
