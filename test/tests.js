@@ -2091,7 +2091,7 @@ QUnit.test("INY", function (assert) {
 
 });
 
-QUnit.test("JMP", function (assert) {
+QUnit.test("JMP a", function (assert) {
 
     mmc.store(0x200, 0x4C); // JMP a
     mmc.store(0x201, 0x03);
@@ -2104,5 +2104,22 @@ QUnit.test("JMP", function (assert) {
 
     assert.equal(cycles, 3, 'JMP a takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'JMP results in PC being set to JMP arg');
+
+});
+
+QUnit.test("JSR a", function (assert) {
+
+    mmc.store(0x200, 0x20); // JSR a
+    mmc.store(0x201, 0xff);
+    mmc.store(0x202, 0x02);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'JSR a takes 6 cycles');
+    assert.equal(cpu.registers.PC, 0x2ff, 'JSR results in PC being set to JMP arg');
+    assert.equal(cpu.pop(), 0x03, 'JSR results PC return address being pushed to the stack');
+    assert.equal(cpu.pop(), 0x02, 'JSR results PC return address being pushed to the stack');
 
 });

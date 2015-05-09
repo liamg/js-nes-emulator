@@ -335,7 +335,7 @@
     NES6502.prototype.instruction_table[0x19] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.ABSOLUTE_Y];
     NES6502.prototype.instruction_table[0x1d] = [NES6502.prototype.opcodes.ORA, NES6502.prototype.addressModes.ABSOLUTE_X];
     NES6502.prototype.instruction_table[0x1e] = [NES6502.prototype.opcodes.ASL, NES6502.prototype.addressModes.ABSOLUTE_X, 7];
-    NES6502.prototype.instruction_table[0x20] = [NES6502.prototype.opcodes.JSR, NES6502.prototype.addressModes.ABSOLUTE];
+    NES6502.prototype.instruction_table[0x20] = [NES6502.prototype.opcodes.JSR, NES6502.prototype.addressModes.ABSOLUTE, 6];
     NES6502.prototype.instruction_table[0x21] = [NES6502.prototype.opcodes.AND, NES6502.prototype.addressModes.INDEXED_INDIRECT, 6];
     NES6502.prototype.instruction_table[0x24] = [NES6502.prototype.opcodes.BIT, NES6502.prototype.addressModes.ZERO_PAGE, 3];
     NES6502.prototype.instruction_table[0x25] = [NES6502.prototype.opcodes.AND, NES6502.prototype.addressModes.ZERO_PAGE, 3];
@@ -971,6 +971,13 @@
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.JMP] = function (addressMode) {
         this.registers.PC = this.readMemory(addressMode).address;
+    };
+
+    NES6502.prototype.operations[NES6502.prototype.opcodes.JSR] = function (addressMode) {
+        var mem = this.readMemory(addressMode);
+        this.push( (this.registers.PC >> 8) & 0xff );
+        this.push( this.registers.PC & 0xff );
+        this.registers.PC = mem.address;
     };
 
     w.JNE.NES6502 = NES6502;
