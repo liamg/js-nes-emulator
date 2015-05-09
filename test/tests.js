@@ -170,7 +170,7 @@ QUnit.test("Initialises registers/flags", function (assert) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is initialised to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is initialised to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is initialised to 0x07FF');
-    assert.equal(cpu.registers.P, 0x2, 'Register P is initialised to 0x00');
+    assert.equal(cpu.registers.P, 0x22, 'Register P is initialised to 0x22');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -194,7 +194,7 @@ QUnit.test("Reset state", function (assert) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is reset to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is reset to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is reset to 0x07FF');
-    assert.equal(cpu.registers.P, 0x2, 'Register P is reset to 0x00');
+    assert.equal(cpu.registers.P, 0x22, 'Register P is reset to 0x22');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -735,9 +735,11 @@ QUnit.test("Flag functions set/clear flags as required", function (assert) {
         cpu.reset();
 
         if (flags[i] == 'Zero') {
-            expectedClear = 0x0;
+            expectedClear = 0x20;
+        } else if (flags[i] == 'Unused') {
+            expectedClear = 0x02;
         } else {
-            expectedClear = 0x2;
+            expectedClear = 0x22;
         }
 
         camel = flags[i].substring(0, 1).toLowerCase() + flags[i].substring(1);
@@ -794,13 +796,13 @@ QUnit.test("Zero flag check", function (assert) {
 
 QUnit.test("Overflow flag check", function (assert) {
 
-    cpu.checkOverflowFlag(0x50, 0x50, 0xa0);
+    cpu.checkOverflowFlag(0x50, 0x50, 0xa0, true);
     assert.equal(cpu.flags.overflow, 1, 'Overflow flag is set when 0x50 + 0x50');
 
     cpu.reset();
 
     cpu.setOverflowFlag();
-    cpu.checkOverflowFlag(0x01, 0x01, 0x02);
+    cpu.checkOverflowFlag(0x01, 0x01, 0x02, true);
     assert.equal(cpu.flags.overflow, 0, 'Overflow flag is clear when 0x01 + 0x01');
 });
 
@@ -948,7 +950,6 @@ QUnit.test("ADC #", function (assert) {
     assert.equal(cpu.registers.A, 0x0, 'A is set to zero');
 
 });
-
 
 QUnit.test("AND #", function (assert) {
 
@@ -2776,3 +2777,88 @@ QUnit.test("RTS", function (assert) {
     assert.equal(cpu.registers.PC, 0x204, 'PC is set to 0x204 after RTS with 0x04 then 0x02 stacked');
 
 });
+
+QUnit.test("SBC #", function (assert) {
+
+    mmc.store(0x200, 0xE9);
+    mmc.store(0x201, 0x01);
+
+    cpu.registers.A = 0x80;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SBC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x7E, '"A" register has value 0x7E stored after SBC 0x80 - 0x01');
+    assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for SBC #');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after SBC 0x80 - 0x01');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after SBC 0x80 - 0x01');
+    assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set after SBC 0x80 - 0x01');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE9);
+    mmc.store(0x201, 0x01);
+
+    cpu.registers.A = 0x02;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SBC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after SBC 0x02 - 0x01');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after SBC 0x02 - 0x01');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after SBC 0x02 - 0x01');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is clear after SBC 0x02 - 0x01');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE9);
+    mmc.store(0x201, 0x01);
+
+    cpu.registers.A = 0x01;
+    cpu.registers.PC = 0x200;
+
+    cpu.setCarryFlag();
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SBC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after SBC 0x01 - 0x01 with carry flag set');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after SBC 0x01 - 0x01 with carry flag set');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after SBC 0x01 - 0x01 with carry flag set');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is clear after SBC 0x01 - 0x01 with carry flag set');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE9);
+    mmc.store(0x201, 0x01);
+
+    cpu.registers.A = 0x0;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SBC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0xfe, '"A" register has value 0xfe stored after SBC 0x0 - 0x01');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after SBC 0x0 - 0x01');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after SBC 0x01 - 0x0');
+    assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is clear after SBC 0x0 - 0x01');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE9);
+    mmc.store(0x201, 0x70);
+
+    cpu.registers.A = 0xd0;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'SBC # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x5f, '"A" register has value 0x5f stored after SBC 0xd0 - 0x70');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after SBC 0xd0 - 0x70');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after SBC 0xd0 - 0x70');
+    assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set after SBC 0xd0 - 0x70');
+});
+
