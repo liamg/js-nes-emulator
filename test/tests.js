@@ -2394,3 +2394,76 @@ QUnit.test("ORA #", function (assert) {
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when ORA result is negative');
 
 });
+
+QUnit.test("PHA", function (assert) {
+
+    mmc.store(0x200, 0x48);
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0x88;
+    var cycles = cpu.execute();
+    assert.equal(cycles, 3, 'PHA takes 3 cycles');
+    assert.equal(cpu.pop(), 0x88, 'PHA pushes value of A to stack');
+});
+
+QUnit.test("PHP", function (assert) {
+
+    mmc.store(0x200, 0x08);
+    cpu.registers.PC = 0x200;
+    var cycles = cpu.execute();
+    assert.equal(cycles, 3, 'PHP takes 3 cycles');
+    assert.equal(cpu.pop(), cpu.registers.P, 'PHP pushes value of P to stack');
+});
+
+QUnit.test("PLA", function (assert) {
+
+    mmc.store(0x200, 0x68);
+    cpu.registers.PC = 0x200;
+    cpu.push(0x77);
+    var cycles = cpu.execute();
+    assert.equal(cycles, 4, 'PLA takes 4 cycles');
+    assert.equal(cpu.registers.A, 0x77, 'PLA pulls value stack pop into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after PLA where stack value is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after PLA where stack value is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x68);
+    cpu.registers.PC = 0x200;
+    cpu.push(0x0);
+    cycles = cpu.execute();
+    assert.equal(cycles, 4, 'PLA takes 4 cycles');
+    assert.equal(cpu.registers.A, 0x0, 'PLA pulls value stack pop into A');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after PLA where stack value is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after PLA where stack value is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0x68);
+    cpu.registers.PC = 0x200;
+    cpu.push(0x80);
+    cycles = cpu.execute();
+    assert.equal(cycles, 4, 'PLA takes 4 cycles');
+    assert.equal(cpu.registers.A, 0x80, 'PLA pulls value stack pop into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after PLA where stack value is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after PLA where stack value is negative');
+
+});
+
+QUnit.test("PLP", function (assert) {
+
+    mmc.store(0x200, 0x28);
+    cpu.registers.PC = 0x200;
+    cpu.push(0xff);
+    var cycles = cpu.execute();
+    assert.equal(cycles, 4, 'PLP takes 4 cycles');
+    assert.equal(cpu.registers.P, 0xff, 'PLP pulls value stack pop into P');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.unused, 0x1, 'Unused flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.brk, 0x1, 'Brk flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.interruptDisable, 0x1, 'IRQ flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.decimal, 0x1, 'Decimal flag is set when PLP pulls 0xff from stack');
+    assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set when PLP pulls 0xff from stack');
+
+});
