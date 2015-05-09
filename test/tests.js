@@ -1793,3 +1793,103 @@ QUnit.test("CPY #", function( assert ) {
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when Y>M on CPY');
 
 });
+
+QUnit.test("DEC a", function( assert ) {
+
+    mmc.store(0x200, 0xCE); // DEC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x09);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'DEC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x8, 'DEC a on 0x9 results in 0x8');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEC a result is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEC a result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xCE); // DEC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x00);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'DEC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0xff, 'DEC a on 0x0 results in 0xff');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEC a result is negative');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEC a result is negative');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xCE); // DEC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x01);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'DEC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0, 'DEC a on 0x1 results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEC a result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEC a result is zero');
+
+});
+
+QUnit.test("INC a", function( assert ) {
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x09);
+
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0x80);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is negative');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INC a result is negative');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xEE); // INC a
+    mmc.store(0x201, 0x03);
+    mmc.store(0x202, 0x02);
+    mmc.store(0x203, 0xff);
+
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 6, 'INC a takes 6 cycles');
+    assert.equal(mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INC a result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is zero');
+
+});
