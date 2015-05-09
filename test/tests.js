@@ -1968,7 +1968,7 @@ QUnit.test("DEX", function( assert ) {
 
     var cycles = cpu.execute();
 
-    assert.equal(cycles, 2, 'DEX takes " cycles');
+    assert.equal(cycles, 2, 'DEX takes 2 cycles');
     assert.equal(cpu.registers.X, 0x0, 'DEX on 0x1 results in 0x0');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEX result is zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEX result is positive');
@@ -1982,7 +1982,7 @@ QUnit.test("DEX", function( assert ) {
 
     cycles = cpu.execute();
 
-    assert.equal(cycles, 2, 'DEX takes " cycles');
+    assert.equal(cycles, 2, 'DEX takes 2 cycles');
     assert.equal(cpu.registers.X, 0xff, 'DEX on 0x0 results in 0xff (-1)');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEX result is non-zero');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEX result is negative');
@@ -1998,7 +1998,7 @@ QUnit.test("DEY", function( assert ) {
 
     var cycles = cpu.execute();
 
-    assert.equal(cycles, 2, 'DEY takes " cycles');
+    assert.equal(cycles, 2, 'DEY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x0, 'DEY on 0x1 results in 0x0');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEY result is zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEY result is positive');
@@ -2012,9 +2012,85 @@ QUnit.test("DEY", function( assert ) {
 
     cycles = cpu.execute();
 
-    assert.equal(cycles, 2, 'DEY takes " cycles');
+    assert.equal(cycles, 2, 'DEY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0xff, 'DEY on 0x0 results in 0xff (-1)');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEY result is non-zero');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEY result is negative');
+
+});
+
+QUnit.test("EOR #", function( assert ) {
+
+    mmc.store(0x200, 0x49); // EOR #$15
+    mmc.store(0x201, 0x15);
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.A = 0x15;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'EOR # takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, 'EOR 0x15 0x15 results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when EOR result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when EOR result is positive');
+});
+
+QUnit.test("INX", function( assert ) {
+
+    mmc.store(0x200, 0xE8); // INX
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.X = 0xff;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'INX takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x0, 'INX on 0xff results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INX result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INX result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE8); // INX
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.X = 0xfe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'INX takes 2 cycles');
+    assert.equal(cpu.registers.X, 0xff, 'INX on 0x0 results is 0xff');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INX result is non-zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INX result is negative');
+
+});
+
+QUnit.test("INY", function( assert ) {
+
+    mmc.store(0x200, 0xC8); // INY
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.Y = 0xff;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'INY takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0x0, 'INY on 0xff results in 0x0');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INY result is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INY result is positive');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xC8); // INY
+
+    cpu.registers.PC = 0x200;
+    cpu.registers.Y = 0xfe;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'INY takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0xff, 'INY on 0x0 results is 0xff');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INY result is non-zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INY result is negative');
 
 });
