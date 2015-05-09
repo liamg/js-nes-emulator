@@ -1695,3 +1695,98 @@ QUnit.test("CMP #", function( assert ) {
 
 
 });
+
+QUnit.test("CPX #", function( assert ) {
+
+    mmc.store(0x200, 0xE0); // CPX
+    mmc.store(0x201, 0x7);
+
+    cpu.registers.X = 0x7;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPX # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when X==M on CPX');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when X==M on CPX');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when X==M on CPX');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE0); // CPX
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.X = 0x7;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPX # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X<M on CPX');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear when X<M on CPX');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when X<M on CPX');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xE0); // CPX
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.X = 0x9;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPX # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X>M on CPX');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when X>M on CPX');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when X>M on CPX');
+
+
+});
+
+QUnit.test("CPY #", function( assert ) {
+
+    mmc.store(0x200, 0xC0); // CPY
+    mmc.store(0x201, 0x7);
+
+    cpu.registers.Y = 0x7;
+    cpu.registers.PC = 0x200;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPY # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when Y==M on CPY');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when Y==M on CPY');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when Y==M on CPY');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xC0); // CPY
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.Y = 0x7;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPY # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y<M on CPY');
+    assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear when Y<M on CPY');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when Y<M on CPY');
+
+    cpu.reset();
+
+    mmc.store(0x200, 0xC0); // CPY
+    mmc.store(0x201, 0x8);
+
+    cpu.registers.Y = 0x9;
+    cpu.registers.PC = 0x200;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'CPY # takes 2 cycles');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y>M on CPY');
+    assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set when Y>M on CPY');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when Y>M on CPY');
+
+});
