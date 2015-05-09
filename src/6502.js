@@ -100,6 +100,14 @@
         (this.flags.negative << 7)) & 0xff;
     };
 
+    NES6502.prototype.checkCarryFlag = function(value){
+        if(value > 0xff){
+            this.setCarryFlag();
+        }else{
+            this.clearCarryFlag();
+        }
+    };
+
     NES6502.prototype.setCarryFlag = function(){
         this.flags.carry = 1;
         this.determineStatus();
@@ -118,6 +126,14 @@
     NES6502.prototype.clearUnusedFlag = function(){
         this.flags.unused = 0;
         this.determineStatus();
+    };
+
+    NES6502.prototype.checkZeroFlag = function(value){
+        if(value === 0){
+            this.setZeroFlag();
+        }else{
+            this.clearZeroFlag();
+        }
     };
 
     NES6502.prototype.setZeroFlag = function(){
@@ -160,6 +176,17 @@
         this.determineStatus();
     };
 
+    NES6502.prototype.checkOverflowFlag = function(a, b, total){
+        /**
+         * http://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
+         */
+        if(((a ^ b) & 0x80) === 0 && ((a ^ total) & 0x80) !== 0){
+            this.setOverflowFlag();
+        }else{
+            this.clearOverflowFlag();
+        }
+    };
+
     NES6502.prototype.setOverflowFlag = function(){
         this.flags.overflow = 1;
         this.determineStatus();
@@ -168,6 +195,14 @@
     NES6502.prototype.clearOverflowFlag = function(){
         this.flags.overflow = 0;
         this.determineStatus();
+    };
+
+    NES6502.prototype.checkNegativeFlag = function(value){
+        if(value & 0x80){
+            this.setNegativeFlag();
+        }else{
+            this.clearNegativeFlag();
+        }
     };
 
     NES6502.prototype.setNegativeFlag = function(){
@@ -566,6 +601,32 @@
         return this.mmc.fetch(((this.registers.SP + 1) & 0xFF) + 0x100);
     };
 
+    NES6502.prototype.execute = function() {
+
+        this.memoryCycles = 0;
+        this.extraCycles = 0;
+
+        var opcode = this.mmc.fetch(this.registers.PC++);
+
+        if(!(opcode in this.instruction_table)){
+            throw "Invalid opcode: 0x" + opcode.toString(16);
+        }
+
+        var instruction = this.instruction_table[opcode];
+
+        if(instruction.length != 3){
+            throw "Invalid instruction definition - wrong number of parameters";
+        }
+
+        if(!(instruction[0] in this.operations)){
+            throw "Operation exists in instruction table but is not defined: 0x" + opcode.toString(16);
+        }
+
+        this.operations[instruction[0]].apply(this, [instruction[1]]);
+
+        return instruction[2] + this.memoryCycles + this.extraCycles;
+    };
+
     // http://www.obelisk.demon.co.uk/6502/reference.html#LDA
     NES6502.prototype.operations = [];
 
@@ -574,17 +635,9 @@
         var value = this.readMemory(addressMode).value;
         this.registers.A = value;
 
-        if(this.registers.A === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
+        this.checkZeroFlag(this.registers.A);
+        this.checkNegativeFlag(this.registers.A);
 
-        if(this.registers.A & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.NOP] = function(addressMode) {
@@ -597,32 +650,10 @@
 
         var tmp = this.registers.A + mem + this.flags.carry;
 
-        /**
-         * http://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
-         */
-        if(((this.registers.A ^ mem) & 0x80) === 0 && ((this.registers.A ^ tmp) & 0x80) !== 0){
-            this.setOverflowFlag();
-        }else{
-            this.clearOverflowFlag();
-        }
-
-        if(tmp > 0xff){
-            this.setCarryFlag();
-        }else{
-            this.clearCarryFlag();
-        }
-
-        if(tmp & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
-
-        if(this.registers.A === 0) {
-            this.setZeroFlag();
-        }else {
-            this.clearZeroFlag();
-        }
+        this.checkOverflowFlag(this.registers.A, mem, tmp);
+        this.checkCarryFlag(tmp);
+        this.checkNegativeFlag(tmp);
+        this.checkZeroFlag(this.registers.A);
 
         this.registers.A = tmp & 0xff;
 
@@ -632,18 +663,8 @@
 
         this.registers.A = this.readMemory(addressMode).value & this.registers.A;
 
-        if(this.registers.A & 0x80){
-            this.setNegativeFlag();
-        }else {
-            this.clearNegativeFlag();
-        }
-
-        if(this.registers.A === 0) {
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
+        this.checkNegativeFlag(this.registers.A);
+        this.checkZeroFlag(this.registers.A);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.ASL] = function(addressMode) {
@@ -659,23 +680,9 @@
             this.mmc.store(mem.address, tmp & 0xff);
         }
 
-        if(tmp > 0xff){
-            this.setCarryFlag();
-        }else{
-            this.clearCarryFlag();
-        }
-
-        if(tmp & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
-
-        if(this.registers.A === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
+        this.checkCarryFlag(tmp);
+        this.checkNegativeFlag(tmp);
+        this.checkZeroFlag(this.registers.A);
 
     };
 
@@ -728,11 +735,7 @@
 
         var mem = this.readMemory(addressMode);
 
-        if((mem.value >> 7) & 1){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkNegativeFlag(mem.value);
 
         if((mem.value >> 6) & 1) {
             this.setOverflowFlag();
@@ -740,12 +743,7 @@
             this.clearOverflowFlag();
         }
 
-        if((this.registers.A & mem.value) > 0){
-            this.clearZeroFlag();
-        }else{
-            this.setZeroFlag();
-        }
-
+        this.checkZeroFlag(this.registers.A & mem.value);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.BMI] = function(addressMode) {
@@ -761,32 +759,6 @@
                 this.extraCycles++;
             }
         }
-    };
-
-    NES6502.prototype.execute = function() {
-
-        this.memoryCycles = 0;
-        this.extraCycles = 0;
-
-        var opcode = this.mmc.fetch(this.registers.PC++);
-
-        if(!(opcode in this.instruction_table)){
-            throw "Invalid opcode: 0x" + opcode.toString(16);
-        }
-
-        var instruction = this.instruction_table[opcode];
-
-        if(instruction.length != 3){
-            throw "Invalid instruction definition - wrong number of parameters";
-        }
-
-        if(!(instruction[0] in this.operations)){
-            throw "Operation exists in instruction table but is not defined: 0x" + opcode.toString(16);
-        }
-
-        this.operations[instruction[0]].apply(this, [instruction[1]]);
-
-        return instruction[2] + this.memoryCycles + this.extraCycles;
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.BNE] = function(addressMode) {
@@ -888,71 +860,44 @@
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.CMP] = function(addressMode) {
 
-        var m = this.readMemory(addressMode).value;
+        var val = this.registers.A - this.readMemory(addressMode).value;
 
-        if(this.registers.A >= m){
+        if(val >= 0){
             this.setCarryFlag();
         }else{
             this.clearCarryFlag();
         }
 
-        if(this.registers.A === m){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(((this.registers.A - m) >> 7) & 1){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(val);
+        this.checkNegativeFlag(val);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.CPX] = function(addressMode) {
 
-        var m = this.readMemory(addressMode).value;
+        var val = this.registers.X - this.readMemory(addressMode).value;
 
-        if(this.registers.X >= m){
+        if(val >= 0){
             this.setCarryFlag();
         }else{
             this.clearCarryFlag();
         }
 
-        if(this.registers.X === m){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(((this.registers.X - m) >> 7) & 1){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(val);
+        this.checkNegativeFlag(val);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.CPY] = function(addressMode) {
 
-        var m = this.readMemory(addressMode).value;
+        var val = this.registers.Y - this.readMemory(addressMode).value;
 
-        if(this.registers.Y >= m){
+        if(val >= 0){
             this.setCarryFlag();
         }else{
             this.clearCarryFlag();
         }
 
-        if(this.registers.Y === m){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(((this.registers.Y - m) >> 7) & 1){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(val);
+        this.checkNegativeFlag(val);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.DEC] = function(addressMode) {
@@ -961,17 +906,8 @@
 
         var r = (m.value - 1) & 0xff;
 
-        if(r === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(r & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(r);
+        this.checkNegativeFlag(r);
 
         this.mmc.store(m.address, r);
     };
@@ -982,17 +918,8 @@
 
         var r = (m.value + 1) & 0xff;
 
-        if(r === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(r & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(r);
+        this.checkNegativeFlag(r);
 
         this.mmc.store(m.address, r);
     };
@@ -1001,34 +928,16 @@
 
         this.registers.X = (this.registers.X - 1) & 0xff;
 
-        if(this.registers.X === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(this.registers.X & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(this.registers.X);
+        this.checkNegativeFlag(this.registers.X);
     };
 
     NES6502.prototype.operations[NES6502.prototype.opcodes.DEY] = function(addressMode) {
 
         this.registers.Y = (this.registers.Y - 1) & 0xff;
 
-        if(this.registers.Y === 0){
-            this.setZeroFlag();
-        }else{
-            this.clearZeroFlag();
-        }
-
-        if(this.registers.Y & 0x80){
-            this.setNegativeFlag();
-        }else{
-            this.clearNegativeFlag();
-        }
+        this.checkZeroFlag(this.registers.Y);
+        this.checkNegativeFlag(this.registers.Y);
     };
 
     w.JNE.NES6502 = NES6502;

@@ -743,6 +743,54 @@ QUnit.test("Flag functions set/clear flags as required", function( assert ) {
 
 });
 
+QUnit.test("Carry flag check", function( assert ) {
+
+    cpu.checkCarryFlag(0x101);
+    assert.equal(cpu.flags.carry, 1, 'Carry flag is set when value is > 0xff');
+
+    cpu.reset();
+
+    cpu.setCarryFlag();
+    cpu.checkCarryFlag(0xff);
+    assert.equal(cpu.flags.carry, 0, 'Carry flag is clear when value is <= 0xff');
+});
+
+QUnit.test("Negative flag check", function( assert ) {
+
+    cpu.checkNegativeFlag(0xff);
+    assert.equal(cpu.flags.negative, 1, 'Negative flag is set when value is 0xff (-1)');
+
+    cpu.reset();
+
+    cpu.setNegativeFlag();
+    cpu.checkNegativeFlag(0x01);
+    assert.equal(cpu.flags.negative, 0, 'Negative flag is clear when value is 0x01');
+});
+
+QUnit.test("Zero flag check", function( assert ) {
+
+    cpu.checkZeroFlag(0x00);
+    assert.equal(cpu.flags.zero, 1, 'Zero flag is set when value is 0x0');
+
+    cpu.reset();
+
+    cpu.setZeroFlag();
+    cpu.checkZeroFlag(0x01);
+    assert.equal(cpu.flags.zero, 0, 'Zero flag is clear when value is 0x01');
+});
+
+QUnit.test("Overflow flag check", function( assert ) {
+
+    cpu.checkOverflowFlag(0x50, 0x50, 0xa0);
+    assert.equal(cpu.flags.overflow, 1, 'Overflow flag is set when 0x50 + 0x50');
+
+    cpu.reset();
+
+    cpu.setOverflowFlag();
+    cpu.checkOverflowFlag(0x01, 0x01, 0x02);
+    assert.equal(cpu.flags.overflow, 0, 'Overflow flag is clear when 0x01 + 0x01');
+});
+
 QUnit.test("Stack operations", function( assert ) {
 
     cpu.push(0x01);
