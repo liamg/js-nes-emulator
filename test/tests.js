@@ -1,13 +1,13 @@
-QUnit.module( "MMC", {
-    setup: function() {
+QUnit.module("MMC", {
+    setup: function () {
         window.mmc = new JNE.MMC();
     },
-    teardown: function() {
+    teardown: function () {
 
     }
 });
 
-QUnit.test("MMC initialises memory", function( assert ) {
+QUnit.test("MMC initialises memory", function (assert) {
 
     assert.equal(mmc.size, 0x10000, 'MMC is configured to initialise 65536 bytes of memory.');
 
@@ -16,16 +16,16 @@ QUnit.test("MMC initialises memory", function( assert ) {
     assert.equal(mmc.fetch(0), 0, 'Memory at zero offset has zero value.');
     assert.equal(mmc.fetch(0x01), 0, 'Memory at 0x01 offset has zero value.');
     assert.equal(mmc.fetch(0xFF), 0, 'Memory at 0xFF offset has zero value.');
-    assert.equal(mmc.fetch(mmc.size-1), 0, 'Memory at last offset has zero value.');
+    assert.equal(mmc.fetch(mmc.size - 1), 0, 'Memory at last offset has zero value.');
 
 });
 
-QUnit.test("MMC resets memory to zero byte values", function( assert ) {
+QUnit.test("MMC resets memory to zero byte values", function (assert) {
 
     mmc.store(0x00, 0x01);
     mmc.store(0x01, 0x01);
     mmc.store(0xFF, 0x01);
-    mmc.store(mmc.size-1, 0x01);
+    mmc.store(mmc.size - 1, 0x01);
 
     mmc.reset();
 
@@ -34,13 +34,13 @@ QUnit.test("MMC resets memory to zero byte values", function( assert ) {
     assert.equal(mmc.fetch(0), 0, 'Memory at zero offset has zero value.');
     assert.equal(mmc.fetch(0x01), 0, 'Memory at 0x01 offset has zero value.');
     assert.equal(mmc.fetch(0xFF), 0, 'Memory at 0xFF offset has zero value.');
-    assert.equal(mmc.fetch(mmc.size-1), 0, 'Memory at last offset has zero value.');
+    assert.equal(mmc.fetch(mmc.size - 1), 0, 'Memory at last offset has zero value.');
 
 });
 
-QUnit.test("MMC stores values in memory", function( assert ) {
+QUnit.test("MMC stores values in memory", function (assert) {
 
-    function testStore(address, value){
+    function testStore(address, value) {
         mmc.store(address, value);
         assert.equal(mmc.memory[address], value, 'Value ' + value + ' is stored at location 0x' + address.toString(16));
     }
@@ -55,16 +55,16 @@ QUnit.test("MMC stores values in memory", function( assert ) {
     testStore(0x01, 0x00);
     testStore(0x01, 0x07);
 
-    testStore(mmc.memory.length-1, 0x01);
-    testStore(mmc.memory.length-1, 0xFF);
-    testStore(mmc.memory.length-1, 0x00);
-    testStore(mmc.memory.length-1, 0x07);
+    testStore(mmc.memory.length - 1, 0x01);
+    testStore(mmc.memory.length - 1, 0xFF);
+    testStore(mmc.memory.length - 1, 0x00);
+    testStore(mmc.memory.length - 1, 0x07);
 
     mmc.store(0x200, 0x1001);
     assert.equal(mmc.memory[0x200], 0x1, 'Values greater than 0xff are ANDed to a single byte');
 
     assert.throws(
-        function(){
+        function () {
             mmc.store(mmc.memory.length, 0x00);
         },
         /Invalid memory address/,
@@ -72,7 +72,7 @@ QUnit.test("MMC stores values in memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.store(-1, 0x00);
         },
         /Invalid memory address/,
@@ -80,7 +80,7 @@ QUnit.test("MMC stores values in memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.store(null, 0x00);
         },
         /Invalid memory address/,
@@ -88,7 +88,7 @@ QUnit.test("MMC stores values in memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.store(undefined, 0x00);
         },
         /Invalid memory address/,
@@ -97,9 +97,9 @@ QUnit.test("MMC stores values in memory", function( assert ) {
 
 });
 
-QUnit.test("MMC retrieves values from memory", function( assert ) {
+QUnit.test("MMC retrieves values from memory", function (assert) {
 
-    function testFetch(address, value){
+    function testFetch(address, value) {
         mmc.store(address, value);
         assert.equal(mmc.fetch(address), value, 'Value ' + value + ' can be retrieved from location 0x' + address.toString(16));
     }
@@ -114,13 +114,13 @@ QUnit.test("MMC retrieves values from memory", function( assert ) {
     testFetch(0xF, 0x00);
     testFetch(0xF, 0x01);
 
-    testFetch(mmc.memory.length-1, 0x01);
-    testFetch(mmc.memory.length-1, 0xFF);
-    testFetch(mmc.memory.length-1, 0x00);
-    testFetch(mmc.memory.length-1, 0x01);
+    testFetch(mmc.memory.length - 1, 0x01);
+    testFetch(mmc.memory.length - 1, 0xFF);
+    testFetch(mmc.memory.length - 1, 0x00);
+    testFetch(mmc.memory.length - 1, 0x01);
 
     assert.throws(
-        function(){
+        function () {
             mmc.fetch(mmc.memory.length);
         },
         /Invalid memory address/,
@@ -128,7 +128,7 @@ QUnit.test("MMC retrieves values from memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.fetch(-1);
         },
         /Invalid memory address/,
@@ -136,7 +136,7 @@ QUnit.test("MMC retrieves values from memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.fetch(null);
         },
         /Invalid memory address/,
@@ -144,7 +144,7 @@ QUnit.test("MMC retrieves values from memory", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             mmc.fetch(undefined);
         },
         /Invalid memory address/,
@@ -153,17 +153,17 @@ QUnit.test("MMC retrieves values from memory", function( assert ) {
 
 });
 
-QUnit.module( "6502 CPU", {
-    setup: function() {
+QUnit.module("6502 CPU", {
+    setup: function () {
         window.mmc = new JNE.MMC();
         window.cpu = new JNE.NES6502(window.mmc);
     },
-    teardown: function() {
+    teardown: function () {
 
     }
 });
 
-QUnit.test("Initialises registers/flags", function( assert ) {
+QUnit.test("Initialises registers/flags", function (assert) {
 
     assert.equal(cpu.registers.A, 0, 'Register A is initialised to 0x00');
     assert.equal(cpu.registers.X, 0, 'Register X is initialised to 0x00');
@@ -178,7 +178,7 @@ QUnit.test("Initialises registers/flags", function( assert ) {
 
 });
 
-QUnit.test("Reset state", function( assert ) {
+QUnit.test("Reset state", function (assert) {
 
     cpu.registers.A = 0x99;
     cpu.registers.X = 0x99;
@@ -202,9 +202,9 @@ QUnit.test("Reset state", function( assert ) {
 
 });
 
-QUnit.test("Instruction table contains valid instructions", function( assert ) {
+QUnit.test("Instruction table contains valid instructions", function (assert) {
 
-    function decodeInstruction(opcode){
+    function decodeInstruction(opcode) {
 
         // split byte into aaabbbcc
         var aaa = (opcode & 224) >> 5;
@@ -216,7 +216,7 @@ QUnit.test("Instruction table contains valid instructions", function( assert ) {
             address_mode: -1
         };
 
-        switch(opcode) {
+        switch (opcode) {
 
             case 0x10:
                 result.operation = cpu.opcodes.BPL;
@@ -521,8 +521,8 @@ QUnit.test("Instruction table contains valid instructions", function( assert ) {
         return result;
 
     }
-    
-    for(var opcode in cpu.instruction_table) {
+
+    for (var opcode in cpu.instruction_table) {
 
         opcode = parseInt(opcode, 10);
 
@@ -538,7 +538,7 @@ QUnit.test("Instruction table contains valid instructions", function( assert ) {
 });
 
 
-QUnit.test("Memory reads in different address modes", function( assert ) {
+QUnit.test("Memory reads in different address modes", function (assert) {
 
     cpu.registers.A = 0x9;
     var accumulator = cpu.readMemory(cpu.addressModes.ACCUMULATOR).value;
@@ -634,7 +634,6 @@ QUnit.test("Memory reads in different address modes", function( assert ) {
     assert.equal(cpu.memoryCycles, 0x1, 'ABSOLUTE Y address mode increments memory cycles for multi page');
 
 
-
     mmc.store(0x00, 0x07);
     mmc.store(0x10, 0x7);
     mmc.store(0x11, 0x5);
@@ -654,7 +653,7 @@ QUnit.test("Memory reads in different address modes", function( assert ) {
     assert.equal(postindex, 0x8, 'INDIRECT INDEXED address mode reads value');
 
     assert.throws(
-        function(){
+        function () {
             cpu.readMemory(0xff);
         },
         /Unsupported addressing mode/,
@@ -662,7 +661,7 @@ QUnit.test("Memory reads in different address modes", function( assert ) {
     );
 
     assert.throws(
-        function(){
+        function () {
             cpu.readMemory(cpu.addressModes.IMPLICIT);
         },
         /Cannot read memory for an implicit addressing mode operation/,
@@ -670,17 +669,16 @@ QUnit.test("Memory reads in different address modes", function( assert ) {
     );
 
 
-
 });
 
-QUnit.test("Invalid opcode check", function( assert ) {
+QUnit.test("Invalid opcode check", function (assert) {
 
     mmc.store(0x200, 0xff);
 
     cpu.registers.PC = 0x200;
 
     assert.throws(
-        function(){
+        function () {
             cpu.execute();
         },
         /Invalid opcode/,
@@ -688,16 +686,16 @@ QUnit.test("Invalid opcode check", function( assert ) {
     );
 });
 
-QUnit.test("Invalid opcode definition check", function( assert ) {
+QUnit.test("Invalid opcode definition check", function (assert) {
 
     mmc.store(0x200, 0xff);
 
-    cpu.instruction_table[0xff] = [0,1];
+    cpu.instruction_table[0xff] = [0, 1];
 
     cpu.registers.PC = 0x200;
 
     assert.throws(
-        function(){
+        function () {
             cpu.execute();
         },
         /Invalid instruction definition - wrong number of parameters/,
@@ -705,16 +703,16 @@ QUnit.test("Invalid opcode definition check", function( assert ) {
     );
 });
 
-QUnit.test("Missing function for opcode check", function( assert ) {
+QUnit.test("Missing function for opcode check", function (assert) {
 
     mmc.store(0x200, 0xc2);
 
     cpu.registers.PC = 0x200;
 
-    cpu.instruction_table[0xc2] = ['NON-EXISTANT',0,0];
+    cpu.instruction_table[0xc2] = ['NON-EXISTANT', 0, 0];
 
     assert.throws(
-        function(){
+        function () {
             cpu.execute();
         },
         /Operation exists in instruction table but is not defined: 0xc2/,
@@ -722,23 +720,23 @@ QUnit.test("Missing function for opcode check", function( assert ) {
     );
 });
 
-QUnit.test("Flag functions set/clear flags as required", function( assert ) {
+QUnit.test("Flag functions set/clear flags as required", function (assert) {
 
     var flags = ['Carry', 'Zero', 'InterruptDisable', 'Decimal', 'Brk', 'Unused', 'Overflow', 'Negative'];
 
     var expectedClear, camel;
 
-    for(var i in flags){
+    for (var i in flags) {
 
-        if(!flags.hasOwnProperty(i)) continue;
+        if (!flags.hasOwnProperty(i)) continue;
 
         var flagValue = Math.pow(2, parseInt(i, 10));
 
         cpu.reset();
 
-        if(flags[i] == 'Zero'){
+        if (flags[i] == 'Zero') {
             expectedClear = 0x0;
-        }else {
+        } else {
             expectedClear = 0x2;
         }
 
@@ -758,7 +756,7 @@ QUnit.test("Flag functions set/clear flags as required", function( assert ) {
 
 });
 
-QUnit.test("Carry flag check", function( assert ) {
+QUnit.test("Carry flag check", function (assert) {
 
     cpu.checkCarryFlag(0x101);
     assert.equal(cpu.flags.carry, 1, 'Carry flag is set when value is > 0xff');
@@ -770,7 +768,7 @@ QUnit.test("Carry flag check", function( assert ) {
     assert.equal(cpu.flags.carry, 0, 'Carry flag is clear when value is <= 0xff');
 });
 
-QUnit.test("Negative flag check", function( assert ) {
+QUnit.test("Negative flag check", function (assert) {
 
     cpu.checkNegativeFlag(0xff);
     assert.equal(cpu.flags.negative, 1, 'Negative flag is set when value is 0xff (-1)');
@@ -782,7 +780,7 @@ QUnit.test("Negative flag check", function( assert ) {
     assert.equal(cpu.flags.negative, 0, 'Negative flag is clear when value is 0x01');
 });
 
-QUnit.test("Zero flag check", function( assert ) {
+QUnit.test("Zero flag check", function (assert) {
 
     cpu.checkZeroFlag(0x00);
     assert.equal(cpu.flags.zero, 1, 'Zero flag is set when value is 0x0');
@@ -794,7 +792,7 @@ QUnit.test("Zero flag check", function( assert ) {
     assert.equal(cpu.flags.zero, 0, 'Zero flag is clear when value is 0x01');
 });
 
-QUnit.test("Overflow flag check", function( assert ) {
+QUnit.test("Overflow flag check", function (assert) {
 
     cpu.checkOverflowFlag(0x50, 0x50, 0xa0);
     assert.equal(cpu.flags.overflow, 1, 'Overflow flag is set when 0x50 + 0x50');
@@ -806,7 +804,7 @@ QUnit.test("Overflow flag check", function( assert ) {
     assert.equal(cpu.flags.overflow, 0, 'Overflow flag is clear when 0x01 + 0x01');
 });
 
-QUnit.test("Stack operations", function( assert ) {
+QUnit.test("Stack operations", function (assert) {
 
     cpu.push(0x01);
     assert.equal(cpu.mmc.fetch(0x1ff), 0x01, 'First stack push writes to 0x1ff');
@@ -847,7 +845,7 @@ QUnit.test("Stack operations", function( assert ) {
 });
 
 
-QUnit.test("LDA #", function( assert ) {
+QUnit.test("LDA #", function (assert) {
 
     mmc.store(0x200, 0xA9);
     mmc.store(0x201, 0x07);
@@ -920,7 +918,7 @@ QUnit.test("LDA #", function( assert ) {
 
 });
 
-QUnit.test("NOP", function( assert ) {
+QUnit.test("NOP", function (assert) {
 
     mmc.store(0x200, 0xEA);
     cpu.registers.PC = 0x200;
@@ -929,7 +927,7 @@ QUnit.test("NOP", function( assert ) {
 
 });
 
-QUnit.test("ADC #", function( assert ) {
+QUnit.test("ADC #", function (assert) {
 
     cpu.registers.A = 0x80;
 
@@ -1035,7 +1033,7 @@ QUnit.test("ADC #", function( assert ) {
 });
 
 
-QUnit.test("AND #", function( assert ) {
+QUnit.test("AND #", function (assert) {
 
     cpu.registers.A = 0x02;
 
@@ -1073,7 +1071,7 @@ QUnit.test("AND #", function( assert ) {
 });
 
 
-QUnit.test("ASL", function( assert ) {
+QUnit.test("ASL", function (assert) {
 
     cpu.registers.A = 0xc;
 
@@ -1146,7 +1144,7 @@ QUnit.test("ASL", function( assert ) {
 
 });
 
-QUnit.test("BCC r", function( assert ) {
+QUnit.test("BCC r", function (assert) {
 
     cpu.flags.carry = 1;
 
@@ -1193,7 +1191,7 @@ QUnit.test("BCC r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is clear');
 });
 
-QUnit.test("BCS r", function( assert ) {
+QUnit.test("BCS r", function (assert) {
 
     mmc.store(0x200, 0xB0); // BCS +2
     mmc.store(0x201, 0x01);
@@ -1242,7 +1240,7 @@ QUnit.test("BCS r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
 });
 
-QUnit.test("BEQ r", function( assert ) {
+QUnit.test("BEQ r", function (assert) {
 
     cpu.flags.zero = 0;
 
@@ -1293,7 +1291,7 @@ QUnit.test("BEQ r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if zero is set');
 });
 
-QUnit.test("BIT a", function( assert ) {
+QUnit.test("BIT a", function (assert) {
 
     mmc.store(0x200, 0x2C); // BIT a
     mmc.store(0x201, 0x03);
@@ -1329,7 +1327,7 @@ QUnit.test("BIT a", function( assert ) {
 
 });
 
-QUnit.test("BMI r", function( assert ) {
+QUnit.test("BMI r", function (assert) {
 
     mmc.store(0x200, 0x30); // BMI +2
     mmc.store(0x201, 0x01);
@@ -1378,7 +1376,7 @@ QUnit.test("BMI r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if negative is set');
 });
 
-QUnit.test("BNE r", function( assert ) {
+QUnit.test("BNE r", function (assert) {
 
     cpu.flags.zero = 1;
 
@@ -1429,7 +1427,7 @@ QUnit.test("BNE r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if zero is clear');
 });
 
-QUnit.test("BPL r", function( assert ) {
+QUnit.test("BPL r", function (assert) {
 
     cpu.flags.negative = 1;
 
@@ -1480,7 +1478,7 @@ QUnit.test("BPL r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if negative is clear');
 });
 
-QUnit.test("BRK", function( assert ) {
+QUnit.test("BRK", function (assert) {
 
     cpu.flags.negative = 1;
 
@@ -1499,14 +1497,14 @@ QUnit.test("BRK", function( assert ) {
     assert.equal(cycles, 7, 'BRK takes 7 cycles');
     assert.equal(cpu.flags.brk, 1, 'BRK flag is set');
     assert.equal(cpu.pop(), initialP, 'P was pushed to stack');
-    assert.equal(cpu.pop(), (initialPC & 0xff) , 'PC[low] was pushed to stack');
+    assert.equal(cpu.pop(), (initialPC & 0xff), 'PC[low] was pushed to stack');
     assert.equal(cpu.pop(), ((initialPC >> 8) & 0xff), 'PC[high] was pushed to stack');
     assert.equal(cpu.registers.PC, 0x102, 'PC was set from 0xFFFE-0xFFFF to 0x102');
 
 });
 
 
-QUnit.test("BVC r", function( assert ) {
+QUnit.test("BVC r", function (assert) {
 
     cpu.flags.overflow = 1;
 
@@ -1553,7 +1551,7 @@ QUnit.test("BVC r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is clear');
 });
 
-QUnit.test("BVS r", function( assert ) {
+QUnit.test("BVS r", function (assert) {
 
     mmc.store(0x200, 0x70); // BCS +2
     mmc.store(0x201, 0x01);
@@ -1602,7 +1600,7 @@ QUnit.test("BVS r", function( assert ) {
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is set');
 });
 
-QUnit.test("CLC", function( assert ) {
+QUnit.test("CLC", function (assert) {
 
     cpu.setCarryFlag();
 
@@ -1630,7 +1628,7 @@ QUnit.test("CLC", function( assert ) {
 
 });
 
-QUnit.test("CLD", function( assert ) {
+QUnit.test("CLD", function (assert) {
 
     cpu.setDecimalFlag();
 
@@ -1658,7 +1656,7 @@ QUnit.test("CLD", function( assert ) {
 
 });
 
-QUnit.test("CLI", function( assert ) {
+QUnit.test("CLI", function (assert) {
 
     cpu.setInterruptDisableFlag();
 
@@ -1686,7 +1684,7 @@ QUnit.test("CLI", function( assert ) {
 
 });
 
-QUnit.test("CLV", function( assert ) {
+QUnit.test("CLV", function (assert) {
 
     cpu.setOverflowFlag();
 
@@ -1714,7 +1712,7 @@ QUnit.test("CLV", function( assert ) {
 
 });
 
-QUnit.test("CMP #", function( assert ) {
+QUnit.test("CMP #", function (assert) {
 
     mmc.store(0x200, 0xC9); // CMP $C9
     mmc.store(0x201, 0x7);
@@ -1762,7 +1760,7 @@ QUnit.test("CMP #", function( assert ) {
 
 });
 
-QUnit.test("CPX #", function( assert ) {
+QUnit.test("CPX #", function (assert) {
 
     mmc.store(0x200, 0xE0); // CPX
     mmc.store(0x201, 0x7);
@@ -1810,7 +1808,7 @@ QUnit.test("CPX #", function( assert ) {
 
 });
 
-QUnit.test("CPY #", function( assert ) {
+QUnit.test("CPY #", function (assert) {
 
     mmc.store(0x200, 0xC0); // CPY
     mmc.store(0x201, 0x7);
@@ -1857,7 +1855,7 @@ QUnit.test("CPY #", function( assert ) {
 
 });
 
-QUnit.test("DEC a", function( assert ) {
+QUnit.test("DEC a", function (assert) {
 
     mmc.store(0x200, 0xCE); // DEC a
     mmc.store(0x201, 0x03);
@@ -1907,7 +1905,7 @@ QUnit.test("DEC a", function( assert ) {
 
 });
 
-QUnit.test("INC a", function( assert ) {
+QUnit.test("INC a", function (assert) {
 
     mmc.store(0x200, 0xEE); // INC a
     mmc.store(0x201, 0x03);
@@ -1957,7 +1955,7 @@ QUnit.test("INC a", function( assert ) {
 
 });
 
-QUnit.test("DEX", function( assert ) {
+QUnit.test("DEX", function (assert) {
 
     mmc.store(0x200, 0xCA); // DEX
 
@@ -1987,7 +1985,7 @@ QUnit.test("DEX", function( assert ) {
 
 });
 
-QUnit.test("DEY", function( assert ) {
+QUnit.test("DEY", function (assert) {
 
     mmc.store(0x200, 0x88); // DEY
 
@@ -2017,7 +2015,7 @@ QUnit.test("DEY", function( assert ) {
 
 });
 
-QUnit.test("EOR #", function( assert ) {
+QUnit.test("EOR #", function (assert) {
 
     mmc.store(0x200, 0x49); // EOR #$15
     mmc.store(0x201, 0x15);
@@ -2033,7 +2031,7 @@ QUnit.test("EOR #", function( assert ) {
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when EOR result is positive');
 });
 
-QUnit.test("INX", function( assert ) {
+QUnit.test("INX", function (assert) {
 
     mmc.store(0x200, 0xE8); // INX
 
@@ -2063,7 +2061,7 @@ QUnit.test("INX", function( assert ) {
 
 });
 
-QUnit.test("INY", function( assert ) {
+QUnit.test("INY", function (assert) {
 
     mmc.store(0x200, 0xC8); // INY
 
@@ -2093,7 +2091,7 @@ QUnit.test("INY", function( assert ) {
 
 });
 
-QUnit.test("JMP", function( assert ) {
+QUnit.test("JMP", function (assert) {
 
     mmc.store(0x200, 0x4C); // JMP a
     mmc.store(0x201, 0x03);
