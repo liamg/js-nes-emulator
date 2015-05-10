@@ -2940,3 +2940,123 @@ QUnit.test("STY a", function (assert) {
     assert.equal(cycles, 4, 'STY a takes 4 cycles');
     assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STY a stores value of Y in memory');
 });
+
+QUnit.test("TAX", function (assert) {
+
+    mmc.store(0x600, 0xAA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x32, 'TAX transfers A into X');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xAA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x0;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x0, 'TAX transfers A into X');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when A is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xAA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x80, 'TAX transfers A into X');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when A is negative');
+});
+
+QUnit.test("TAY", function (assert) {
+
+    mmc.store(0x600, 0xA8);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAY a takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0x32, 'TAY transfers A into Y');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xA8);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x0;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAY a takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0x0, 'TAY transfers A into Y');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when A is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when A is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xA8);
+    cpu.registers.PC = 0x600;
+    cpu.registers.A = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAY a takes 2 cycles');
+    assert.equal(cpu.registers.Y, 0x80, 'TAY transfers A into Y');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when A is negative');
+});
+
+QUnit.test("TSX", function (assert) {
+
+    mmc.store(0x600, 0xBA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.SP = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x32, 'TAX transfers SP into X');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when SP is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when SP is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xBA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.SP = 0x0;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x0, 'TAX transfers SP into X');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when SP is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when SP is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0xBA);
+    cpu.registers.PC = 0x600;
+    cpu.registers.SP = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TAX a takes 2 cycles');
+    assert.equal(cpu.registers.X, 0x80, 'TAX transfers SP into X');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when SP is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when SP is negative');
+});
