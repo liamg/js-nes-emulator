@@ -202,7 +202,7 @@ QUnit.test("Reset state", function (assert) {
 
 });
 
-QUnit.test("Instruction table contains valid instructions", function (assert) {
+QUnit.test("Instruction table integrity", function (assert) {
 
     function decodeInstruction(opcode) {
 
@@ -531,6 +531,7 @@ QUnit.test("Instruction table contains valid instructions", function (assert) {
         var operation = cpu.instruction_table[opcode][0];
         var address_mode = cpu.instruction_table[opcode][1];
 
+        assert.equal(cpu.instruction_table[opcode].length, 3, 'Instruction 0x' + opcode.toString(16) + ' has wrong number of paramters present in instruction table.');
         assert.equal(cpu.getOpcodeText(operation), cpu.getOpcodeText(decoded.operation), 'Operation matches for 0x' + opcode.toString(16) + ' (' + cpu.getOpcodeText(operation) + ')');
         assert.equal(cpu.getAddressModeText(address_mode), cpu.getAddressModeText(decoded.address_mode), 'Address mode matches for 0x' + opcode.toString(16) + ' (' + cpu.getOpcodeText(operation) + ')');
     }
@@ -683,40 +684,6 @@ QUnit.test("Invalid opcode check", function (assert) {
         },
         /Invalid opcode/,
         'Error thrown on invalid opcode'
-    );
-});
-
-QUnit.test("Invalid opcode definition check", function (assert) {
-
-    cpu.mmc.store(0x200, 0xff);
-
-    cpu.instruction_table[0xff] = [0, 1];
-
-    cpu.registers.PC = 0x200;
-
-    assert.throws(
-        function () {
-            cpu.execute();
-        },
-        /Invalid instruction definition - wrong number of parameters/,
-        'Error thrown on use of opcode with invalid definition'
-    );
-});
-
-QUnit.test("Missing function for opcode check", function (assert) {
-
-    cpu.mmc.store(0x200, 0xc2);
-
-    cpu.registers.PC = 0x200;
-
-    cpu.instruction_table[0xc2] = ['NON-EXISTANT', 0, 0];
-
-    assert.throws(
-        function () {
-            cpu.execute();
-        },
-        /Operation exists in instruction table but is not defined: 0xc2/,
-        'Error thrown on missing opcode function'
     );
 });
 

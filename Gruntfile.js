@@ -17,11 +17,17 @@ module.exports = function(grunt) {
                 }
             }
         },
-        copy: {
-            main: {
-                files: [
-                    {src: ['src/demo.html'], dest: 'dist/demo.html', filter: 'isFile'}
-                ]
+        'string-replace': {
+            version: {
+                files: {
+                        'tmp/version.js': 'src/version.js.rep'
+                },
+                options: {
+                    replacements: [{
+                        pattern: /{{ VERSION }}/g,
+                        replacement: '<%= pkg.version %>'
+                    }]
+                }
             }
         },
         jshint: {
@@ -34,7 +40,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 // the files to concatenate
-                src: ['src/*.js'],
+                src: ['src/*.js', 'tmp/version.js'],
                 // the location of the resulting JS file
                 dest: 'dist/<%= pkg.name %>.js'
             }
@@ -72,13 +78,13 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-qunit-istanbul');
-    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-coveralls');
 
-    grunt.registerTask('default', ['jshint', 'copy', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'string-replace', 'concat', 'uglify']);
     grunt.registerTask('test', ['jshint', 'qunit']);
     grunt.registerTask('coverage', ['coveralls']);
 };

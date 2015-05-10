@@ -1,0 +1,8 @@
+(function (w) {
+    "use strict";
+
+    w.JNE = w.JNE || {};
+
+    w.JNE.VERSION = '{{ VERSION }}';
+
+})(window);

@@ -418,8 +418,6 @@
     CPU.prototype.instruction_table[0x3e] = [CPU.prototype.opcodes.ROL, CPU.prototype.addressModes.ABSOLUTE_X, 7];
     CPU.prototype.instruction_table[0x40] = [CPU.prototype.opcodes.RTI, CPU.prototype.addressModes.IMPLICIT, 6];
     CPU.prototype.instruction_table[0x41] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.INDEXED_INDIRECT, 6];
-    CPU.prototype.instruction_table[0x42] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.IMMEDIATE];
-    //CPU.prototype.instruction_table[0x44] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE];
     CPU.prototype.instruction_table[0x45] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.ZERO_PAGE, 3];
     CPU.prototype.instruction_table[0x46] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.ZERO_PAGE, 5];
     CPU.prototype.instruction_table[0x48] = [CPU.prototype.opcodes.PHA, CPU.prototype.addressModes.IMPLICIT,3];
@@ -430,17 +428,14 @@
     CPU.prototype.instruction_table[0x4e] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.ABSOLUTE, 6];
     CPU.prototype.instruction_table[0x50] = [CPU.prototype.opcodes.BVC, CPU.prototype.addressModes.RELATIVE, 2];
     CPU.prototype.instruction_table[0x51] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.INDIRECT_INDEXED, 5];
-    CPU.prototype.instruction_table[0x54] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE_X];
     CPU.prototype.instruction_table[0x55] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.ZERO_PAGE_X, 4];
     CPU.prototype.instruction_table[0x56] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.ZERO_PAGE_X, 6];
     CPU.prototype.instruction_table[0x58] = [CPU.prototype.opcodes.CLI, CPU.prototype.addressModes.IMPLICIT, 2];
     CPU.prototype.instruction_table[0x59] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.ABSOLUTE_Y, 4];
-    CPU.prototype.instruction_table[0x5c] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ABSOLUTE_X];
     CPU.prototype.instruction_table[0x5d] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.ABSOLUTE_X, 4];
     CPU.prototype.instruction_table[0x5e] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.ABSOLUTE_X, 7];
     CPU.prototype.instruction_table[0x60] = [CPU.prototype.opcodes.RTS, CPU.prototype.addressModes.IMPLICIT, 6];
     CPU.prototype.instruction_table[0x61] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.INDEXED_INDIRECT, 6];
-    CPU.prototype.instruction_table[0x64] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE];
     CPU.prototype.instruction_table[0x65] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.ZERO_PAGE, 3];
     CPU.prototype.instruction_table[0x66] = [CPU.prototype.opcodes.ROR, CPU.prototype.addressModes.ZERO_PAGE, 5];
     CPU.prototype.instruction_table[0x68] = [CPU.prototype.opcodes.PLA, CPU.prototype.addressModes.IMPLICIT, 4];
@@ -451,12 +446,10 @@
     CPU.prototype.instruction_table[0x6e] = [CPU.prototype.opcodes.ROR, CPU.prototype.addressModes.ABSOLUTE, 6];
     CPU.prototype.instruction_table[0x70] = [CPU.prototype.opcodes.BVS, CPU.prototype.addressModes.RELATIVE, 2];
     CPU.prototype.instruction_table[0x71] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.INDIRECT_INDEXED, 5];
-    CPU.prototype.instruction_table[0x74] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE_X];
     CPU.prototype.instruction_table[0x75] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.ZERO_PAGE_X, 4];
     CPU.prototype.instruction_table[0x76] = [CPU.prototype.opcodes.ROR, CPU.prototype.addressModes.ZERO_PAGE_X, 6];
     CPU.prototype.instruction_table[0x78] = [CPU.prototype.opcodes.SEI, CPU.prototype.addressModes.IMPLICIT, 2];
     CPU.prototype.instruction_table[0x79] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.ABSOLUTE_Y, 4];
-    CPU.prototype.instruction_table[0x7c] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ABSOLUTE_X];
     CPU.prototype.instruction_table[0x7d] = [CPU.prototype.opcodes.ADC, CPU.prototype.addressModes.ABSOLUTE_X, 4];
     CPU.prototype.instruction_table[0x7e] = [CPU.prototype.opcodes.ROR, CPU.prototype.addressModes.ABSOLUTE_X, 7];
     CPU.prototype.instruction_table[0x81] = [CPU.prototype.opcodes.STA, CPU.prototype.addressModes.INDEXED_INDIRECT, 6];
@@ -517,7 +510,6 @@
     CPU.prototype.instruction_table[0xd6] = [CPU.prototype.opcodes.DEC, CPU.prototype.addressModes.ZERO_PAGE_X, 6];
     CPU.prototype.instruction_table[0xd8] = [CPU.prototype.opcodes.CLD, CPU.prototype.addressModes.IMPLICIT, 2];
     CPU.prototype.instruction_table[0xd9] = [CPU.prototype.opcodes.CMP, CPU.prototype.addressModes.ABSOLUTE_Y, 4];
-    CPU.prototype.instruction_table[0xdc] = [CPU.prototype.opcodes.CPY, CPU.prototype.addressModes.ABSOLUTE_X];
     CPU.prototype.instruction_table[0xdd] = [CPU.prototype.opcodes.CMP, CPU.prototype.addressModes.ABSOLUTE_X, 4];
     CPU.prototype.instruction_table[0xde] = [CPU.prototype.opcodes.DEC, CPU.prototype.addressModes.ABSOLUTE_X, 7];
     CPU.prototype.instruction_table[0xe0] = [CPU.prototype.opcodes.CPX, CPU.prototype.addressModes.IMMEDIATE, 2];
@@ -533,12 +525,10 @@
     CPU.prototype.instruction_table[0xee] = [CPU.prototype.opcodes.INC, CPU.prototype.addressModes.ABSOLUTE, 6];
     CPU.prototype.instruction_table[0xf0] = [CPU.prototype.opcodes.BEQ, CPU.prototype.addressModes.RELATIVE, 2];
     CPU.prototype.instruction_table[0xf1] = [CPU.prototype.opcodes.SBC, CPU.prototype.addressModes.INDIRECT_INDEXED, 5];
-    CPU.prototype.instruction_table[0xf4] = [CPU.prototype.opcodes.CPX, CPU.prototype.addressModes.ZERO_PAGE_X];
     CPU.prototype.instruction_table[0xf5] = [CPU.prototype.opcodes.SBC, CPU.prototype.addressModes.ZERO_PAGE_X, 4];
     CPU.prototype.instruction_table[0xf6] = [CPU.prototype.opcodes.INC, CPU.prototype.addressModes.ZERO_PAGE_X, 6];
     CPU.prototype.instruction_table[0xf8] = [CPU.prototype.opcodes.SED, CPU.prototype.addressModes.IMPLICIT, 2];
     CPU.prototype.instruction_table[0xf9] = [CPU.prototype.opcodes.SBC, CPU.prototype.addressModes.ABSOLUTE_Y, 4];
-    CPU.prototype.instruction_table[0xfc] = [CPU.prototype.opcodes.CPX, CPU.prototype.addressModes.ABSOLUTE_X];
     CPU.prototype.instruction_table[0xfd] = [CPU.prototype.opcodes.SBC, CPU.prototype.addressModes.ABSOLUTE_X, 4];
     CPU.prototype.instruction_table[0xfe] = [CPU.prototype.opcodes.INC, CPU.prototype.addressModes.ABSOLUTE_X, 7];
 
@@ -667,19 +657,11 @@
 
         var opcode = this.mmc.fetch(this.registers.PC++);
 
-        if (!(opcode in this.instruction_table)) {
+        if (typeof this.instruction_table[opcode] === 'undefined') {
             throw new this.CPUError("Invalid opcode: 0x" + opcode.toString(16));
         }
 
         var instruction = this.instruction_table[opcode];
-
-        if (instruction.length != 3) {
-            throw new this.CPUError("Invalid instruction definition - wrong number of parameters");
-        }
-
-        if (!(instruction[0] in this.operations)) {
-            throw new this.CPUError("Operation exists in instruction table but is not defined: 0x" + opcode.toString(16));
-        }
 
         this.operations[instruction[0]].apply(this, [instruction[1]]);
 
