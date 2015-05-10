@@ -170,7 +170,7 @@ QUnit.test("Initialises registers/flags", function (assert) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is initialised to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is initialised to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is initialised to 0x07FF');
-    assert.equal(cpu.registers.P, 0x22, 'Register P is initialised to 0x22');
+    assert.equal(cpu.registers.P, 0x36, 'Register P is initialised to 0x36');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -194,7 +194,7 @@ QUnit.test("Reset state", function (assert) {
     assert.equal(cpu.registers.Y, 0, 'Register Y is reset to 0x00');
     assert.equal(cpu.registers.SP, 0x01FF, 'Register SP is reset to 0x01FF');
     assert.equal(cpu.registers.PC, 0x07FF, 'Register PC is reset to 0x07FF');
-    assert.equal(cpu.registers.P, 0x22, 'Register P is reset to 0x22');
+    assert.equal(cpu.registers.P, 0x36, 'Register P is reset to 0x36');
 
     assert.equal(cpu.flags.negative, 0, 'Negative flag is not initially set');
     assert.equal(cpu.flags.carry, 0, 'Carry flag is not initially set');
@@ -734,13 +734,7 @@ QUnit.test("Flag functions set/clear flags as required", function (assert) {
 
         cpu.reset();
 
-        if (flags[i] == 'Zero') {
-            expectedClear = 0x20;
-        } else if (flags[i] == 'Unused') {
-            expectedClear = 0x02;
-        } else {
-            expectedClear = 0x22;
-        }
+        expectedClear = (cpu.registers.P & flagValue) ? cpu.registers.P - flagValue : cpu.registers.P;
 
         camel = flags[i].substring(0, 1).toLowerCase() + flags[i].substring(1);
 
@@ -828,6 +822,7 @@ QUnit.test("Stack operations", function (assert) {
     cpu.push(0x01);
     cpu.push(0x02);
     cpu.push(0x03);
+    cpu.mmc.store(0x100, 0x0);
     assert.equal(cpu.pop(), 0x03, 'Values pushed to stack are popped back off in FILO order');
     assert.equal(cpu.pop(), 0x02, 'Values pushed to stack are popped back off in FILO order');
     assert.equal(cpu.pop(), 0x01, 'Values pushed to stack are popped back off in FILO order');
@@ -3176,7 +3171,7 @@ QUnit.test("ADC", function (assert) {
     bytes = assembler.assemble('ADC $10');
     expected = [0x65, 0x10];
     assert.deepEqual(bytes, expected, 'ADC $10 assembles');
-    
+
     // ABSOLUTE
     bytes = assembler.assemble('ADC $1020');
     expected = [0x6D, 0x20, 0x10];
@@ -3587,6 +3582,6 @@ QUnit.test("Example programs", function(assert){
         0xd0, 0xfb, 0x60
     ];
 
-    assert.deepEqual(assembler.assemble(code), expected, 'Example program assembly test #3');
+    assert.deepEqual(assembler.assemble(code), expected, 'Assemble complete snake game from http://skilldrick.github.io/easy6502/#snake');
 
 });

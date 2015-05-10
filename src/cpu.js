@@ -83,15 +83,57 @@
         this.setZeroFlag();
         this.clearCarryFlag();
         this.clearNegativeFlag();
-        this.clearInterruptDisableFlag();
+        this.setInterruptDisableFlag();
         this.clearDecimalFlag();
-        this.clearBrkFlag();
+        this.setBrkFlag();
         this.clearOverflowFlag();
         this.setUnusedFlag();
 
         this.setPFromFlags();
 
         this.mmc.reset();
+
+        /**
+         $0000-$07FF	$800	2KB of work RAM
+         $0800-$0FFF	$800	Mirror of $000-$7FF
+         $1000-$17FF	$800    Mirror of $000-$7FF
+         $1800-$1FFF	$800	Mirror of $000-$7FF
+         $2000-$2007	$8      PPU Ctrl Registers
+         $2008-$3FFF	$1FF8	*Mirror of $2000-$2007
+         $4000-$4020    $20     Registers (Mostly APU)
+         $4020-$5FFF	$1FDF   Cartridge Expansion ROM
+         $6000-$7FFF	$2000	SRAM
+         $8000-$BFFF	$4000	PRG-ROM
+         $C000-$FFFF	$4000	PRG-ROM
+
+         http://wiki.nesdev.com/w/index.php/CPU_power_up_state
+
+         */
+
+        for (var i = 0; i < 0x2000; i++) {
+            this.mmc.store(i, 0xFF);
+        }
+
+        this.mmc.store(0x008, 0xF7);
+        this.mmc.store(0x009, 0xEF);
+        this.mmc.store(0x00A, 0xDF);
+        this.mmc.store(0x00F, 0xBF);
+        this.mmc.store(0x808, 0xF7);
+        this.mmc.store(0x809, 0xEF);
+        this.mmc.store(0x80A, 0xDF);
+        this.mmc.store(0x80F, 0xBF);
+        this.mmc.store(0x1008, 0xF7);
+        this.mmc.store(0x1009, 0xEF);
+        this.mmc.store(0x100A, 0xDF);
+        this.mmc.store(0x100F, 0xBF);
+        this.mmc.store(0x1808, 0xF7);
+        this.mmc.store(0x1809, 0xEF);
+        this.mmc.store(0x180A, 0xDF);
+        this.mmc.store(0x180F, 0xBF);
+
+        for (i = 0x2000; i < this.mmc.length; i++) {
+            this.mmc.store(i, 0);
+        }
     };
 
     /**
@@ -106,7 +148,7 @@
         (this.flags.unused << 5) |
         (this.flags.overflow << 6) |
         (this.flags.negative << 7)) & 0xff;
-    };
+    }; // 00110110
 
     CPU.prototype.setFlagsFromP = function () {
         this.flags.carry = this.registers.P & 0x1;
