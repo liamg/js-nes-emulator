@@ -3060,3 +3060,96 @@ QUnit.test("TSX", function (assert) {
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when SP is non zero');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when SP is negative');
 });
+
+QUnit.test("TXA", function (assert) {
+
+    mmc.store(0x600, 0x8A);
+    cpu.registers.PC = 0x600;
+    cpu.registers.X = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TXA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x32, 'TXA transfers X into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when X is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0x8A);
+    cpu.registers.PC = 0x600;
+    cpu.registers.X = 0x0;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TXA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, 'TXA transfers X into A');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when X is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when X is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0x8A);
+    cpu.registers.PC = 0x600;
+    cpu.registers.X = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TXA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x80, 'TXA transfers X into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when X is negative');
+});
+
+QUnit.test("TXS", function (assert) {
+
+    mmc.store(0x600, 0x9A);
+    cpu.registers.PC = 0x600;
+    cpu.registers.X = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TXS a takes 2 cycles');
+    assert.equal(cpu.registers.SP, 0x32, 'TXS transfers X into SP');
+
+});
+
+QUnit.test("TYA", function (assert) {
+
+    mmc.store(0x600, 0x98);
+    cpu.registers.PC = 0x600;
+    cpu.registers.Y = 0x32;
+
+    var cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TYA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x32, 'TYA transfers Y into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y is non zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when Y is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0x98);
+    cpu.registers.PC = 0x600;
+    cpu.registers.Y = 0x0;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TYA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x0, 'TYA transfers Y into A');
+    assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when Y is zero');
+    assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when Y is not negative');
+
+    cpu.reset();
+
+    mmc.store(0x600, 0x98);
+    cpu.registers.PC = 0x600;
+    cpu.registers.Y = 0x80;
+
+    cycles = cpu.execute();
+
+    assert.equal(cycles, 2, 'TYA a takes 2 cycles');
+    assert.equal(cpu.registers.A, 0x80, 'TYA transfers Y into A');
+    assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y is non zero');
+    assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when Y is negative');
+});
