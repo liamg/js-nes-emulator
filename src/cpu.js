@@ -377,7 +377,7 @@
     CPU.prototype.instruction_table[0x40] = [CPU.prototype.opcodes.RTI, CPU.prototype.addressModes.IMPLICIT, 6];
     CPU.prototype.instruction_table[0x41] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.INDEXED_INDIRECT, 6];
     CPU.prototype.instruction_table[0x42] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.IMMEDIATE];
-    CPU.prototype.instruction_table[0x44] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE];
+    //CPU.prototype.instruction_table[0x44] = [CPU.prototype.opcodes.JMP, CPU.prototype.addressModes.ZERO_PAGE];
     CPU.prototype.instruction_table[0x45] = [CPU.prototype.opcodes.EOR, CPU.prototype.addressModes.ZERO_PAGE, 3];
     CPU.prototype.instruction_table[0x46] = [CPU.prototype.opcodes.LSR, CPU.prototype.addressModes.ZERO_PAGE, 5];
     CPU.prototype.instruction_table[0x48] = [CPU.prototype.opcodes.PHA, CPU.prototype.addressModes.IMPLICIT,3];
