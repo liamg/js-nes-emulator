@@ -3,7 +3,7 @@ QUnit.module("MMC", {
         window.mmc = new JNE.MMC();
     },
     teardown: function () {
-
+        window.mmc = null;
     }
 });
 
@@ -155,11 +155,11 @@ QUnit.test("MMC retrieves values from memory", function (assert) {
 
 QUnit.module("6502 CPU", {
     setup: function () {
-        window.mmc = new JNE.MMC();
-        window.cpu = new JNE.NES6502(window.mmc);
+        var mmc = new JNE.MMC();
+        window.cpu = new JNE.CPU(mmc);
     },
     teardown: function () {
-
+        window.cpu = null;
     }
 });
 
@@ -544,89 +544,89 @@ QUnit.test("Memory reads in different address modes", function (assert) {
     var accumulator = cpu.readMemory(cpu.addressModes.ACCUMULATOR).value;
     assert.equal(accumulator, 0x9, 'ACCUMULATOR address mode reads value');
 
-    mmc.store(0xf, 0xff);
+    cpu.mmc.store(0xf, 0xff);
     cpu.registers.PC = 0xf;
     var imm = cpu.readMemory(cpu.addressModes.IMMEDIATE).value;
     assert.equal(imm, 0xff, 'IMMEDIATE address mode reads value');
 
-    mmc.store(0x101, 0x3);
-    mmc.store(0x102, 0x9);
-    mmc.store(0x103, 0x8);
-    mmc.store(0x104, 0x7);
-    mmc.store(0x105, 0x6);
+    cpu.mmc.store(0x101, 0x3);
+    cpu.mmc.store(0x102, 0x9);
+    cpu.mmc.store(0x103, 0x8);
+    cpu.mmc.store(0x104, 0x7);
+    cpu.mmc.store(0x105, 0x6);
     cpu.registers.PC = 0x101;
     var rel = cpu.readMemory(cpu.addressModes.RELATIVE).value;
     assert.equal(rel, 0x6, 'RELATIVE address mode reads value');
 
-    mmc.store(0x101, 0x3);
-    mmc.store(0x102, 0x9);
-    mmc.store(0x103, 0x82);
-    mmc.store(0x104, 0x7);
-    mmc.store(0x105, 0x6);
+    cpu.mmc.store(0x101, 0x3);
+    cpu.mmc.store(0x102, 0x9);
+    cpu.mmc.store(0x103, 0x82);
+    cpu.mmc.store(0x104, 0x7);
+    cpu.mmc.store(0x105, 0x6);
     cpu.registers.PC = 0x103;
     rel = cpu.readMemory(cpu.addressModes.RELATIVE).value;
     assert.equal(rel, 0x9, 'RELATIVE address mode reads value when negative offset');
 
-    mmc.store(0xf, 0x1);
+    cpu.mmc.store(0xf, 0x1);
     cpu.registers.PC = 0xf;
     var zpval = cpu.readMemory(cpu.addressModes.ZERO_PAGE).value;
     assert.equal(zpval, 0x1, 'ZERO PAGE address mode reads value');
 
-    mmc.store(0x6, 0x2);
+    cpu.mmc.store(0x6, 0x2);
     cpu.registers.PC = 0x3;
     cpu.registers.X = 0x3;
     var zpxval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_X).value;
     assert.equal(zpxval, 0x2, 'ZERO PAGE X address mode reads value');
 
-    mmc.store(0xa, 0x3);
+    cpu.mmc.store(0xa, 0x3);
     cpu.registers.PC = 0x8;
     cpu.registers.Y = 0x2;
     var zpyval = cpu.readMemory(cpu.addressModes.ZERO_PAGE_Y).value;
     assert.equal(zpyval, 0x3, 'ZERO PAGE Y address mode reads value');
 
-    mmc.store(0x101, 0xaa);
-    mmc.store(0x102, 0xaa);
-    mmc.store(0xaaaa, 0x1);
+    cpu.mmc.store(0x101, 0xaa);
+    cpu.mmc.store(0x102, 0xaa);
+    cpu.mmc.store(0xaaaa, 0x1);
     cpu.registers.PC = 0x101;
     var absval = cpu.readMemory(cpu.addressModes.ABSOLUTE).value;
     assert.equal(absval, 0x1, 'ABSOLUTE address mode reads value');
 
-    mmc.store(0x101, 0x01);
-    mmc.store(0x102, 0xcc);
-    mmc.store(0xcc01, 0x1);
+    cpu.mmc.store(0x101, 0x01);
+    cpu.mmc.store(0x102, 0xcc);
+    cpu.mmc.store(0xcc01, 0x1);
     cpu.registers.PC = 0x101;
     var absleval = cpu.readMemory(cpu.addressModes.ABSOLUTE).value;
     assert.equal(absleval, 0x1, 'ABSOLUTE address mode reads value (little endian)');
 
-    mmc.store(0x101, 0xcc);
-    mmc.store(0x102, 0x99);
-    mmc.store(0x99cd, 0x1);
+    cpu.mmc.store(0x101, 0xcc);
+    cpu.mmc.store(0x102, 0x99);
+    cpu.mmc.store(0x99cd, 0x1);
     cpu.registers.PC = 0x101;
     cpu.registers.X = 0x1;
     var absxval = cpu.readMemory(cpu.addressModes.ABSOLUTE_X).value;
     assert.equal(absxval, 0x1, 'ABSOLUTE X address mode reads value');
 
-    mmc.store(0x103, 0x33);
-    mmc.store(0x104, 0xcc);
-    mmc.store(0xcc36, 0x1);
+    cpu.mmc.store(0x103, 0x33);
+    cpu.mmc.store(0x104, 0xcc);
+    cpu.mmc.store(0xcc36, 0x1);
     cpu.registers.PC = 0x103;
     cpu.registers.Y = 0x3;
     var absyval = cpu.readMemory(cpu.addressModes.ABSOLUTE_Y).value;
     assert.equal(absyval, 0x1, 'ABSOLUTE Y address mode reads value');
 
 
-    mmc.store(0x101, 0xff);
-    mmc.store(0x102, 0x77);
-    mmc.store(0x77ff, 0x1);
+    cpu.mmc.store(0x101, 0xff);
+    cpu.mmc.store(0x102, 0x77);
+    cpu.mmc.store(0x77ff, 0x1);
     cpu.registers.PC = 0x101;
     cpu.registers.X = 0x1;
     cpu.memoryCycles = 0;
     cpu.readMemory(cpu.addressModes.ABSOLUTE_X);
     assert.equal(cpu.memoryCycles, 0x1, 'ABSOLUTE X address mode increments memory cycles for multi page');
 
-    mmc.store(0x101, 0xff);
-    mmc.store(0x102, 0x77);
-    mmc.store(0x77ff, 0x1);
+    cpu.mmc.store(0x101, 0xff);
+    cpu.mmc.store(0x102, 0x77);
+    cpu.mmc.store(0x77ff, 0x1);
     cpu.registers.PC = 0x101;
     cpu.registers.Y = 0x1;
     cpu.memoryCycles = 0;
@@ -634,19 +634,19 @@ QUnit.test("Memory reads in different address modes", function (assert) {
     assert.equal(cpu.memoryCycles, 0x1, 'ABSOLUTE Y address mode increments memory cycles for multi page');
 
 
-    mmc.store(0x00, 0x07);
-    mmc.store(0x10, 0x7);
-    mmc.store(0x11, 0x5);
-    mmc.store(0x507, 0x4);
+    cpu.mmc.store(0x00, 0x07);
+    cpu.mmc.store(0x10, 0x7);
+    cpu.mmc.store(0x11, 0x5);
+    cpu.mmc.store(0x507, 0x4);
     cpu.registers.PC = 0x00;
     cpu.registers.X = 0x09;
     var preindex = cpu.readMemory(cpu.addressModes.INDEXED_INDIRECT).value;
     assert.equal(preindex, 0x4, 'INDEXED INDIRECT address mode reads value');
 
-    mmc.store(0x00, 0x07);
-    mmc.store(0x07, 0x01);
-    mmc.store(0x08, 0x03);
-    mmc.store(0x302, 0x08);
+    cpu.mmc.store(0x00, 0x07);
+    cpu.mmc.store(0x07, 0x01);
+    cpu.mmc.store(0x08, 0x03);
+    cpu.mmc.store(0x302, 0x08);
     cpu.registers.PC = 0x00;
     cpu.registers.Y = 0x01;
     var postindex = cpu.readMemory(cpu.addressModes.INDIRECT_INDEXED).value;
@@ -673,7 +673,7 @@ QUnit.test("Memory reads in different address modes", function (assert) {
 
 QUnit.test("Invalid opcode check", function (assert) {
 
-    mmc.store(0x200, 0xff);
+    cpu.mmc.store(0x200, 0xff);
 
     cpu.registers.PC = 0x200;
 
@@ -688,7 +688,7 @@ QUnit.test("Invalid opcode check", function (assert) {
 
 QUnit.test("Invalid opcode definition check", function (assert) {
 
-    mmc.store(0x200, 0xff);
+    cpu.mmc.store(0x200, 0xff);
 
     cpu.instruction_table[0xff] = [0, 1];
 
@@ -705,7 +705,7 @@ QUnit.test("Invalid opcode definition check", function (assert) {
 
 QUnit.test("Missing function for opcode check", function (assert) {
 
-    mmc.store(0x200, 0xc2);
+    cpu.mmc.store(0x200, 0xc2);
 
     cpu.registers.PC = 0x200;
 
@@ -850,8 +850,8 @@ QUnit.test("ADC #", function (assert) {
 
     cpu.registers.A = 0x80;
 
-    mmc.store(0x200, 0x69); // ADC
-    mmc.store(0x201, 0x01); // #3
+    cpu.mmc.store(0x200, 0x69); // ADC
+    cpu.mmc.store(0x201, 0x01); // #3
 
     cpu.registers.PC = 0x200;
 
@@ -869,8 +869,8 @@ QUnit.test("ADC #", function (assert) {
 
     cpu.registers.A = 0x02;
 
-    mmc.store(0x200, 0x69); // ADC
-    mmc.store(0x201, 0x01); // #$1
+    cpu.mmc.store(0x200, 0x69); // ADC
+    cpu.mmc.store(0x201, 0x01); // #$1
 
     cpu.registers.PC = 0x200;
 
@@ -893,10 +893,10 @@ QUnit.test("ADC #", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.flags.carry = 0;
 
-    mmc.store(0x200, 0x69); // ADC
-    mmc.store(0x201, 0xff); // #$ff
-    mmc.store(0x202, 0x69); // ADC
-    mmc.store(0x203, 0x00); // #$0
+    cpu.mmc.store(0x200, 0x69); // ADC
+    cpu.mmc.store(0x201, 0xff); // #$ff
+    cpu.mmc.store(0x202, 0x69); // ADC
+    cpu.mmc.store(0x203, 0x00); // #$0
 
     cycles = cpu.execute();
 
@@ -923,8 +923,8 @@ QUnit.test("ADC #", function (assert) {
     cpu.registers.A = 0x50;
     cpu.registers.PC = 0x200;
 
-    mmc.store(0x200, 0x69); // ADC
-    mmc.store(0x201, 0x50); // #$ff
+    cpu.mmc.store(0x200, 0x69); // ADC
+    cpu.mmc.store(0x201, 0x50); // #$ff
 
     cycles = cpu.execute();
 
@@ -940,8 +940,8 @@ QUnit.test("ADC #", function (assert) {
     cpu.registers.A = 0x00;
     cpu.registers.PC = 0x200;
 
-    mmc.store(0x200, 0x69); // ADC
-    mmc.store(0x201, 0x00); // #$2
+    cpu.mmc.store(0x200, 0x69); // ADC
+    cpu.mmc.store(0x201, 0x00); // #$2
 
     cycles = cpu.execute();
 
@@ -955,8 +955,8 @@ QUnit.test("AND #", function (assert) {
 
     cpu.registers.A = 0x02;
 
-    mmc.store(0x200, 0x29); // AND
-    mmc.store(0x201, 0x01); // #$1
+    cpu.mmc.store(0x200, 0x29); // AND
+    cpu.mmc.store(0x201, 0x01); // #$1
 
     cpu.registers.PC = 0x200;
 
@@ -972,8 +972,8 @@ QUnit.test("AND #", function (assert) {
 
     cpu.registers.A = 0xff;
 
-    mmc.store(0x200, 0x29); // AND
-    mmc.store(0x201, 0x80); // #$80
+    cpu.mmc.store(0x200, 0x29); // AND
+    cpu.mmc.store(0x201, 0x80); // #$80
 
     cpu.registers.PC = 0x200;
 
@@ -993,7 +993,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.registers.A = 0xc;
 
-    mmc.store(0x200, 0x0A); // ASL A
+    cpu.mmc.store(0x200, 0x0A); // ASL A
 
     cpu.registers.PC = 0x200;
 
@@ -1009,17 +1009,17 @@ QUnit.test("ASL", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x0E); // ASL a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x07);
+    cpu.mmc.store(0x200, 0x0E); // ASL a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x07);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'ASL a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0xE, 'Memory at 0x203 has value 0xE stored');
+    assert.equal(cpu.mmc.fetch(0x203), 0xE, 'Memory at 0x203 has value 0xE stored');
     assert.equal(cpu.registers.PC, 0x203, 'Program counter is incremented 3 times for ASL a');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
@@ -1027,7 +1027,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x0A); // ASL A
+    cpu.mmc.store(0x200, 0x0A); // ASL A
 
     cpu.registers.PC = 0x200;
 
@@ -1044,7 +1044,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x0A); // ASL A
+    cpu.mmc.store(0x200, 0x0A); // ASL A
 
     cpu.registers.PC = 0x200;
 
@@ -1066,10 +1066,10 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.flags.carry = 1;
 
-    mmc.store(0x200, 0x90); // BCC +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0x90); // BCC +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1080,11 +1080,11 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x2fe, 0x90); // BCC +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0x90); // BCC +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1095,11 +1095,11 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x90); // BCC +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0x90); // BCC +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1111,10 +1111,10 @@ QUnit.test("BCC r", function (assert) {
 
 QUnit.test("BCS r", function (assert) {
 
-    mmc.store(0x200, 0xB0); // BCS +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0xB0); // BCS +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1127,11 +1127,11 @@ QUnit.test("BCS r", function (assert) {
 
     cpu.flags.carry = 1;
 
-    mmc.store(0x2fe, 0xB0); // BCS +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0xB0); // BCS +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1144,11 +1144,11 @@ QUnit.test("BCS r", function (assert) {
 
     cpu.flags.carry = 1;
 
-    mmc.store(0x200, 0xB0); // BCS +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0xB0); // BCS +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1162,10 +1162,10 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.flags.zero = 0;
 
-    mmc.store(0x200, 0xF0); // BEQ +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0xF0); // BEQ +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1178,11 +1178,11 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.flags.zero = 1;
 
-    mmc.store(0x2fe, 0xF0); // BEQ +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0xF0); // BEQ +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1195,11 +1195,11 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.flags.zero = 1;
 
-    mmc.store(0x200, 0xF0); // BEQ +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0xF0); // BEQ +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1211,10 +1211,10 @@ QUnit.test("BEQ r", function (assert) {
 
 QUnit.test("BIT a", function (assert) {
 
-    mmc.store(0x200, 0x2C); // BIT a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0xff);
+    cpu.mmc.store(0x200, 0x2C); // BIT a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0xff);
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0xff;
@@ -1228,10 +1228,10 @@ QUnit.test("BIT a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2C); // BIT a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x00);
+    cpu.mmc.store(0x200, 0x2C); // BIT a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x00);
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0xff;
@@ -1247,10 +1247,10 @@ QUnit.test("BIT a", function (assert) {
 
 QUnit.test("BMI r", function (assert) {
 
-    mmc.store(0x200, 0x30); // BMI +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0x30); // BMI +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1263,11 +1263,11 @@ QUnit.test("BMI r", function (assert) {
 
     cpu.flags.negative = 1;
 
-    mmc.store(0x2fe, 0x30); // BMI +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0x30); // BMI +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1280,11 +1280,11 @@ QUnit.test("BMI r", function (assert) {
 
     cpu.flags.negative = 1;
 
-    mmc.store(0x200, 0x30); // BMI +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0x30); // BMI +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1298,10 +1298,10 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.flags.zero = 1;
 
-    mmc.store(0x200, 0xD0); // BNE +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0xD0); // BNE +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1314,11 +1314,11 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.flags.zero = 0;
 
-    mmc.store(0x2fe, 0xD0); // BNE +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0xD0); // BNE +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1331,11 +1331,11 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.flags.zero = 0;
 
-    mmc.store(0x200, 0xD0); // BNE +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0xD0); // BNE +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1349,10 +1349,10 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.flags.negative = 1;
 
-    mmc.store(0x200, 0x10); // BPL +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0x10); // BPL +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1365,11 +1365,11 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.flags.negative = 0;
 
-    mmc.store(0x2fe, 0x10); // BPL +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0x10); // BPL +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1382,11 +1382,11 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.flags.negative = 0;
 
-    mmc.store(0x200, 0x10); // BPL +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0x10); // BPL +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1400,9 +1400,9 @@ QUnit.test("BRK", function (assert) {
 
     cpu.flags.negative = 1;
 
-    mmc.store(0x200, 0x00); // BRK
-    mmc.store(0xFFFE, 0x02);
-    mmc.store(0xFFFF, 0x01);
+    cpu.mmc.store(0x200, 0x00); // BRK
+    cpu.mmc.store(0xFFFE, 0x02);
+    cpu.mmc.store(0xFFFF, 0x01);
 
     cpu.registers.PC = 0x200;
 
@@ -1426,10 +1426,10 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.flags.overflow = 1;
 
-    mmc.store(0x200, 0x50); // BCC +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0x50); // BCC +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1440,11 +1440,11 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x2fe, 0x50); // BCC +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0x50); // BCC +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1455,11 +1455,11 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x50); // BCC +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0x50); // BCC +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1471,10 +1471,10 @@ QUnit.test("BVC r", function (assert) {
 
 QUnit.test("BVS r", function (assert) {
 
-    mmc.store(0x200, 0x70); // BCS +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x03);
+    cpu.mmc.store(0x200, 0x70); // BCS +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x03);
 
     cpu.registers.PC = 0x200;
 
@@ -1487,11 +1487,11 @@ QUnit.test("BVS r", function (assert) {
 
     cpu.flags.overflow = 1;
 
-    mmc.store(0x2fe, 0x70); // BCS +2
-    mmc.store(0x2ff, 0x01);
-    mmc.store(0x300, 0x02);
-    mmc.store(0x301, 0x01);
-    mmc.store(0x302, 0x04);
+    cpu.mmc.store(0x2fe, 0x70); // BCS +2
+    cpu.mmc.store(0x2ff, 0x01);
+    cpu.mmc.store(0x300, 0x02);
+    cpu.mmc.store(0x301, 0x01);
+    cpu.mmc.store(0x302, 0x04);
 
     cpu.registers.PC = 0x2fe;
 
@@ -1504,11 +1504,11 @@ QUnit.test("BVS r", function (assert) {
 
     cpu.flags.overflow = 1;
 
-    mmc.store(0x200, 0x70); // BCS +2
-    mmc.store(0x201, 0x01);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
-    mmc.store(0x204, 0x07);
+    cpu.mmc.store(0x200, 0x70); // BCS +2
+    cpu.mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x204, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -1522,7 +1522,7 @@ QUnit.test("CLC", function (assert) {
 
     cpu.setCarryFlag();
 
-    mmc.store(0x200, 0x18); // CLC +2
+    cpu.mmc.store(0x200, 0x18); // CLC +2
 
     cpu.registers.PC = 0x200;
 
@@ -1535,7 +1535,7 @@ QUnit.test("CLC", function (assert) {
 
     cpu.clearCarryFlag();
 
-    mmc.store(0x200, 0x18); // CLC +2
+    cpu.mmc.store(0x200, 0x18); // CLC +2
 
     cpu.registers.PC = 0x200;
 
@@ -1550,7 +1550,7 @@ QUnit.test("CLD", function (assert) {
 
     cpu.setDecimalFlag();
 
-    mmc.store(0x200, 0xD8); // CLD +2
+    cpu.mmc.store(0x200, 0xD8); // CLD +2
 
     cpu.registers.PC = 0x200;
 
@@ -1563,7 +1563,7 @@ QUnit.test("CLD", function (assert) {
 
     cpu.clearDecimalFlag();
 
-    mmc.store(0x200, 0xD8); // CLC +2
+    cpu.mmc.store(0x200, 0xD8); // CLC +2
 
     cpu.registers.PC = 0x200;
 
@@ -1578,7 +1578,7 @@ QUnit.test("CLI", function (assert) {
 
     cpu.setInterruptDisableFlag();
 
-    mmc.store(0x200, 0x58); // CLI +2
+    cpu.mmc.store(0x200, 0x58); // CLI +2
 
     cpu.registers.PC = 0x200;
 
@@ -1591,7 +1591,7 @@ QUnit.test("CLI", function (assert) {
 
     cpu.clearInterruptDisableFlag();
 
-    mmc.store(0x200, 0x58); // CLI +2
+    cpu.mmc.store(0x200, 0x58); // CLI +2
 
     cpu.registers.PC = 0x200;
 
@@ -1606,7 +1606,7 @@ QUnit.test("CLV", function (assert) {
 
     cpu.setOverflowFlag();
 
-    mmc.store(0x200, 0xB8); // CLV +2
+    cpu.mmc.store(0x200, 0xB8); // CLV +2
 
     cpu.registers.PC = 0x200;
 
@@ -1619,7 +1619,7 @@ QUnit.test("CLV", function (assert) {
 
     cpu.clearOverflowFlag();
 
-    mmc.store(0x200, 0xB8); // CLV +2
+    cpu.mmc.store(0x200, 0xB8); // CLV +2
 
     cpu.registers.PC = 0x200;
 
@@ -1632,8 +1632,8 @@ QUnit.test("CLV", function (assert) {
 
 QUnit.test("CMP #", function (assert) {
 
-    mmc.store(0x200, 0xC9); // CMP $C9
-    mmc.store(0x201, 0x7);
+    cpu.mmc.store(0x200, 0xC9); // CMP $C9
+    cpu.mmc.store(0x201, 0x7);
 
     cpu.registers.A = 0x7;
     cpu.registers.PC = 0x200;
@@ -1647,8 +1647,8 @@ QUnit.test("CMP #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xC9); // CMP $C9
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xC9); // CMP $C9
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.A = 0x7;
     cpu.registers.PC = 0x200;
@@ -1662,8 +1662,8 @@ QUnit.test("CMP #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xC9); // CMP $C9
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xC9); // CMP $C9
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.A = 0x9;
     cpu.registers.PC = 0x200;
@@ -1680,8 +1680,8 @@ QUnit.test("CMP #", function (assert) {
 
 QUnit.test("CPX #", function (assert) {
 
-    mmc.store(0x200, 0xE0); // CPX
-    mmc.store(0x201, 0x7);
+    cpu.mmc.store(0x200, 0xE0); // CPX
+    cpu.mmc.store(0x201, 0x7);
 
     cpu.registers.X = 0x7;
     cpu.registers.PC = 0x200;
@@ -1695,8 +1695,8 @@ QUnit.test("CPX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE0); // CPX
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xE0); // CPX
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.X = 0x7;
     cpu.registers.PC = 0x200;
@@ -1710,8 +1710,8 @@ QUnit.test("CPX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE0); // CPX
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xE0); // CPX
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.X = 0x9;
     cpu.registers.PC = 0x200;
@@ -1728,8 +1728,8 @@ QUnit.test("CPX #", function (assert) {
 
 QUnit.test("CPY #", function (assert) {
 
-    mmc.store(0x200, 0xC0); // CPY
-    mmc.store(0x201, 0x7);
+    cpu.mmc.store(0x200, 0xC0); // CPY
+    cpu.mmc.store(0x201, 0x7);
 
     cpu.registers.Y = 0x7;
     cpu.registers.PC = 0x200;
@@ -1743,8 +1743,8 @@ QUnit.test("CPY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xC0); // CPY
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xC0); // CPY
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.Y = 0x7;
     cpu.registers.PC = 0x200;
@@ -1758,8 +1758,8 @@ QUnit.test("CPY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xC0); // CPY
-    mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x200, 0xC0); // CPY
+    cpu.mmc.store(0x201, 0x8);
 
     cpu.registers.Y = 0x9;
     cpu.registers.PC = 0x200;
@@ -1775,49 +1775,49 @@ QUnit.test("CPY #", function (assert) {
 
 QUnit.test("DEC a", function (assert) {
 
-    mmc.store(0x200, 0xCE); // DEC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x09);
+    cpu.mmc.store(0x200, 0xCE); // DEC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x09);
 
     cpu.registers.PC = 0x200;
 
     var cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x8, 'DEC a on 0x9 results in 0x8');
+    assert.equal(cpu.mmc.fetch(0x203), 0x8, 'DEC a on 0x9 results in 0x8');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEC a result is non zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEC a result is positive');
 
     cpu.reset();
 
-    mmc.store(0x200, 0xCE); // DEC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x00);
+    cpu.mmc.store(0x200, 0xCE); // DEC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x00);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0xff, 'DEC a on 0x0 results in 0xff');
+    assert.equal(cpu.mmc.fetch(0x203), 0xff, 'DEC a on 0x0 results in 0xff');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when DEC a result is negative');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when DEC a result is negative');
 
     cpu.reset();
 
-    mmc.store(0x200, 0xCE); // DEC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x200, 0xCE); // DEC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0, 'DEC a on 0x1 results in 0x0');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0, 'DEC a on 0x1 results in 0x0');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when DEC a result is zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when DEC a result is zero');
 
@@ -1825,7 +1825,7 @@ QUnit.test("DEC a", function (assert) {
 
 QUnit.test("DEX", function (assert) {
 
-    mmc.store(0x200, 0xCA); // DEX
+    cpu.mmc.store(0x200, 0xCA); // DEX
 
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0x01;
@@ -1839,7 +1839,7 @@ QUnit.test("DEX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xCA); // DEX
+    cpu.mmc.store(0x200, 0xCA); // DEX
 
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0x00;
@@ -1855,7 +1855,7 @@ QUnit.test("DEX", function (assert) {
 
 QUnit.test("DEY", function (assert) {
 
-    mmc.store(0x200, 0x88); // DEY
+    cpu.mmc.store(0x200, 0x88); // DEY
 
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0x01;
@@ -1869,7 +1869,7 @@ QUnit.test("DEY", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x88); // DEY
+    cpu.mmc.store(0x200, 0x88); // DEY
 
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0x00;
@@ -1885,8 +1885,8 @@ QUnit.test("DEY", function (assert) {
 
 QUnit.test("EOR #", function (assert) {
 
-    mmc.store(0x200, 0x49); // EOR #$15
-    mmc.store(0x201, 0x15);
+    cpu.mmc.store(0x200, 0x49); // EOR #$15
+    cpu.mmc.store(0x201, 0x15);
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x15;
@@ -1901,49 +1901,49 @@ QUnit.test("EOR #", function (assert) {
 
 QUnit.test("INC a", function (assert) {
 
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x09);
+    cpu.mmc.store(0x200, 0xEE); // INC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x09);
 
     cpu.registers.PC = 0x200;
 
     var cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is non zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is positive');
 
     cpu.reset();
 
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x80);
+    cpu.mmc.store(0x200, 0xEE); // INC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x80);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
+    assert.equal(cpu.mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when INC a result is negative');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when INC a result is negative');
 
     cpu.reset();
 
-    mmc.store(0x200, 0xEE); // INC a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0xff);
+    cpu.mmc.store(0x200, 0xEE); // INC a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0xff);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when INC a result is zero');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear when INC a result is zero');
 
@@ -1951,7 +1951,7 @@ QUnit.test("INC a", function (assert) {
 
 QUnit.test("INX", function (assert) {
 
-    mmc.store(0x200, 0xE8); // INX
+    cpu.mmc.store(0x200, 0xE8); // INX
 
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0xff;
@@ -1965,7 +1965,7 @@ QUnit.test("INX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE8); // INX
+    cpu.mmc.store(0x200, 0xE8); // INX
 
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0xfe;
@@ -1981,7 +1981,7 @@ QUnit.test("INX", function (assert) {
 
 QUnit.test("INY", function (assert) {
 
-    mmc.store(0x200, 0xC8); // INY
+    cpu.mmc.store(0x200, 0xC8); // INY
 
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0xff;
@@ -1995,7 +1995,7 @@ QUnit.test("INY", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xC8); // INY
+    cpu.mmc.store(0x200, 0xC8); // INY
 
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0xfe;
@@ -2011,10 +2011,10 @@ QUnit.test("INY", function (assert) {
 
 QUnit.test("JMP a", function (assert) {
 
-    mmc.store(0x200, 0x4C); // JMP a
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x09);
+    cpu.mmc.store(0x200, 0x4C); // JMP a
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x09);
 
     cpu.registers.PC = 0x200;
 
@@ -2027,9 +2027,9 @@ QUnit.test("JMP a", function (assert) {
 
 QUnit.test("JSR a", function (assert) {
 
-    mmc.store(0x200, 0x20); // JSR a
-    mmc.store(0x201, 0xff);
-    mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x200, 0x20); // JSR a
+    cpu.mmc.store(0x201, 0xff);
+    cpu.mmc.store(0x202, 0x02);
 
     cpu.registers.PC = 0x200;
 
@@ -2044,8 +2044,8 @@ QUnit.test("JSR a", function (assert) {
 
 QUnit.test("LDA #", function (assert) {
 
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA9);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2057,12 +2057,12 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x8);
-    mmc.store(0x202, 0xA9);
-    mmc.store(0x203, 0xf);
-    mmc.store(0x204, 0xA9);
-    mmc.store(0x205, 0x00);
+    cpu.mmc.store(0x200, 0xA9);
+    cpu.mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x202, 0xA9);
+    cpu.mmc.store(0x203, 0xf);
+    cpu.mmc.store(0x204, 0xA9);
+    cpu.mmc.store(0x205, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2079,8 +2079,8 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x00);
+    cpu.mmc.store(0x200, 0xA9);
+    cpu.mmc.store(0x201, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2091,8 +2091,8 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA9);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2103,8 +2103,8 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA9);
-    mmc.store(0x201, 0x81);
+    cpu.mmc.store(0x200, 0xA9);
+    cpu.mmc.store(0x201, 0x81);
 
     cpu.registers.PC = 0x200;
 
@@ -2117,8 +2117,8 @@ QUnit.test("LDA #", function (assert) {
 
 QUnit.test("LDX #", function (assert) {
 
-    mmc.store(0x200, 0xA2);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA2);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2130,12 +2130,12 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA2);
-    mmc.store(0x201, 0x8);
-    mmc.store(0x202, 0xA2);
-    mmc.store(0x203, 0xf);
-    mmc.store(0x204, 0xA2);
-    mmc.store(0x205, 0x00);
+    cpu.mmc.store(0x200, 0xA2);
+    cpu.mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x202, 0xA2);
+    cpu.mmc.store(0x203, 0xf);
+    cpu.mmc.store(0x204, 0xA2);
+    cpu.mmc.store(0x205, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2152,8 +2152,8 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA2);
-    mmc.store(0x201, 0x00);
+    cpu.mmc.store(0x200, 0xA2);
+    cpu.mmc.store(0x201, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2164,8 +2164,8 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA2);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA2);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2176,8 +2176,8 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA2);
-    mmc.store(0x201, 0x81);
+    cpu.mmc.store(0x200, 0xA2);
+    cpu.mmc.store(0x201, 0x81);
 
     cpu.registers.PC = 0x200;
 
@@ -2190,8 +2190,8 @@ QUnit.test("LDX #", function (assert) {
 
 QUnit.test("LDY #", function (assert) {
 
-    mmc.store(0x200, 0xA0);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA0);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2203,12 +2203,12 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA0);
-    mmc.store(0x201, 0x8);
-    mmc.store(0x202, 0xA0);
-    mmc.store(0x203, 0xf);
-    mmc.store(0x204, 0xA0);
-    mmc.store(0x205, 0x00);
+    cpu.mmc.store(0x200, 0xA0);
+    cpu.mmc.store(0x201, 0x8);
+    cpu.mmc.store(0x202, 0xA0);
+    cpu.mmc.store(0x203, 0xf);
+    cpu.mmc.store(0x204, 0xA0);
+    cpu.mmc.store(0x205, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2225,8 +2225,8 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA0);
-    mmc.store(0x201, 0x00);
+    cpu.mmc.store(0x200, 0xA0);
+    cpu.mmc.store(0x201, 0x00);
 
     cpu.registers.PC = 0x200;
 
@@ -2237,8 +2237,8 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA0);
-    mmc.store(0x201, 0x07);
+    cpu.mmc.store(0x200, 0xA0);
+    cpu.mmc.store(0x201, 0x07);
 
     cpu.registers.PC = 0x200;
 
@@ -2249,8 +2249,8 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xA0);
-    mmc.store(0x201, 0x81);
+    cpu.mmc.store(0x200, 0xA0);
+    cpu.mmc.store(0x201, 0x81);
 
     cpu.registers.PC = 0x200;
 
@@ -2263,7 +2263,7 @@ QUnit.test("LDY #", function (assert) {
 
 QUnit.test("LSR A", function (assert) {
 
-    mmc.store(0x200, 0x4a);
+    cpu.mmc.store(0x200, 0x4a);
 
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
@@ -2278,7 +2278,7 @@ QUnit.test("LSR A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x4a);
+    cpu.mmc.store(0x200, 0x4a);
 
     cpu.registers.A = 0x01;
     cpu.registers.PC = 0x200;
@@ -2295,34 +2295,34 @@ QUnit.test("LSR A", function (assert) {
 
 QUnit.test("LSR a", function (assert) {
 
-    mmc.store(0x200, 0x4e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x08);
+    cpu.mmc.store(0x200, 0x4e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x08);
 
     cpu.registers.PC = 0x200;
 
     var cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'LSR A takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x04, 'Memory has value 0x04 stored after LSR of 0x08');
+    assert.equal(cpu.mmc.fetch(0x203), 0x04, 'Memory has value 0x04 stored after LSR of 0x08');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
     assert.equal(cpu.flags.carry, 0x0, 'Carry flag is clear after LSR of 0x08');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after LSR of 0x08');
 
     cpu.reset();
 
-    mmc.store(0x200, 0x4e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x200, 0x4e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
 
     cpu.registers.PC = 0x200;
 
     cycles = cpu.execute();
 
     assert.equal(cycles, 6, 'LSR A takes 6 cycles');
-    assert.equal(mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after LSR of 0x01');
+    assert.equal(cpu.mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after LSR of 0x01');
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is clear after LSR');
     assert.equal(cpu.flags.carry, 0x1, 'Carry flag is set after LSR of 0x01');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after LSR of 0x01');
@@ -2330,7 +2330,7 @@ QUnit.test("LSR a", function (assert) {
 
 QUnit.test("NOP", function (assert) {
 
-    mmc.store(0x200, 0xEA);
+    cpu.mmc.store(0x200, 0xEA);
     cpu.registers.PC = 0x200;
 
     var preState_registers = JSON.stringify(cpu.registers);
@@ -2351,8 +2351,8 @@ QUnit.test("NOP", function (assert) {
 
 QUnit.test("ORA #", function (assert) {
 
-    mmc.store(0x200, 0x09); // ORA
-    mmc.store(0x201, 0x15); // 00010101
+    cpu.mmc.store(0x200, 0x09); // ORA
+    cpu.mmc.store(0x201, 0x15); // 00010101
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x40; // 01000000
@@ -2366,8 +2366,8 @@ QUnit.test("ORA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x09); // ORA
-    mmc.store(0x201, 0x00); // 00000000
+    cpu.mmc.store(0x200, 0x09); // ORA
+    cpu.mmc.store(0x201, 0x00); // 00000000
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x00; // 00000000
@@ -2381,8 +2381,8 @@ QUnit.test("ORA #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x09); // ORA
-    mmc.store(0x201, 0x80); // 10000000
+    cpu.mmc.store(0x200, 0x09); // ORA
+    cpu.mmc.store(0x201, 0x80); // 10000000
 
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x01; // 00000001
@@ -2398,7 +2398,7 @@ QUnit.test("ORA #", function (assert) {
 
 QUnit.test("PHA", function (assert) {
 
-    mmc.store(0x200, 0x48);
+    cpu.mmc.store(0x200, 0x48);
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x88;
     var cycles = cpu.execute();
@@ -2408,7 +2408,7 @@ QUnit.test("PHA", function (assert) {
 
 QUnit.test("PHP", function (assert) {
 
-    mmc.store(0x200, 0x08);
+    cpu.mmc.store(0x200, 0x08);
     cpu.registers.PC = 0x200;
     var cycles = cpu.execute();
     assert.equal(cycles, 3, 'PHP takes 3 cycles');
@@ -2417,7 +2417,7 @@ QUnit.test("PHP", function (assert) {
 
 QUnit.test("PLA", function (assert) {
 
-    mmc.store(0x200, 0x68);
+    cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x77);
     var cycles = cpu.execute();
@@ -2428,7 +2428,7 @@ QUnit.test("PLA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x68);
+    cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x0);
     cycles = cpu.execute();
@@ -2439,7 +2439,7 @@ QUnit.test("PLA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x68);
+    cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x80);
     cycles = cpu.execute();
@@ -2452,7 +2452,7 @@ QUnit.test("PLA", function (assert) {
 
 QUnit.test("PLP", function (assert) {
 
-    mmc.store(0x200, 0x28);
+    cpu.mmc.store(0x200, 0x28);
     cpu.registers.PC = 0x200;
     cpu.push(0xff);
     var cycles = cpu.execute();
@@ -2471,7 +2471,7 @@ QUnit.test("PLP", function (assert) {
 
 QUnit.test("ROL A", function (assert) {
 
-    mmc.store(0x200, 0x2a);
+    cpu.mmc.store(0x200, 0x2a);
 
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
@@ -2486,7 +2486,7 @@ QUnit.test("ROL A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2a);
+    cpu.mmc.store(0x200, 0x2a);
 
     cpu.registers.A = 0x80;
     cpu.registers.PC = 0x200;
@@ -2501,7 +2501,7 @@ QUnit.test("ROL A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2a);
+    cpu.mmc.store(0x200, 0x2a);
 
     cpu.registers.A = 0x40;
     cpu.registers.PC = 0x200;
@@ -2516,7 +2516,7 @@ QUnit.test("ROL A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2a);
+    cpu.mmc.store(0x200, 0x2a);
 
     cpu.setCarryFlag();
     cpu.registers.A = 0x0;
@@ -2533,10 +2533,10 @@ QUnit.test("ROL A", function (assert) {
 
 QUnit.test("ROL a", function (assert) {
 
-    mmc.store(0x200, 0x2e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x08);
+    cpu.mmc.store(0x200, 0x2e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x08);
 
     cpu.registers.PC = 0x200;
 
@@ -2550,10 +2550,10 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x80);
+    cpu.mmc.store(0x200, 0x2e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x80);
 
     cpu.registers.PC = 0x200;
 
@@ -2567,10 +2567,10 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x40);
+    cpu.mmc.store(0x200, 0x2e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x40);
 
     cpu.registers.PC = 0x200;
 
@@ -2584,12 +2584,12 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x2e);
+    cpu.mmc.store(0x200, 0x2e);
 
     cpu.setCarryFlag();
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x0);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x0);
 
     cpu.registers.PC = 0x200;
 
@@ -2604,7 +2604,7 @@ QUnit.test("ROL a", function (assert) {
 
 QUnit.test("ROR A", function (assert) {
 
-    mmc.store(0x200, 0x6a);
+    cpu.mmc.store(0x200, 0x6a);
 
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
@@ -2619,7 +2619,7 @@ QUnit.test("ROR A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6a);
+    cpu.mmc.store(0x200, 0x6a);
 
     cpu.registers.A = 0x1;
     cpu.registers.PC = 0x200;
@@ -2634,7 +2634,7 @@ QUnit.test("ROR A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6a);
+    cpu.mmc.store(0x200, 0x6a);
 
     cpu.setCarryFlag();
     cpu.registers.A = 0x2;
@@ -2650,7 +2650,7 @@ QUnit.test("ROR A", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6a);
+    cpu.mmc.store(0x200, 0x6a);
 
     cpu.setCarryFlag();
     cpu.registers.A = 0x1;
@@ -2667,10 +2667,10 @@ QUnit.test("ROR A", function (assert) {
 
 QUnit.test("ROR a", function (assert) {
 
-    mmc.store(0x200, 0x6e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x08);
+    cpu.mmc.store(0x200, 0x6e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x08);
 
     cpu.registers.PC = 0x200;
 
@@ -2684,10 +2684,10 @@ QUnit.test("ROR a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x1);
+    cpu.mmc.store(0x200, 0x6e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x1);
 
     cpu.registers.PC = 0x200;
 
@@ -2701,10 +2701,10 @@ QUnit.test("ROR a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x02);
+    cpu.mmc.store(0x200, 0x6e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x02);
 
     cpu.setCarryFlag();
     cpu.registers.PC = 0x200;
@@ -2719,10 +2719,10 @@ QUnit.test("ROR a", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0x6e);
-    mmc.store(0x201, 0x03);
-    mmc.store(0x202, 0x02);
-    mmc.store(0x203, 0x01);
+    cpu.mmc.store(0x200, 0x6e);
+    cpu.mmc.store(0x201, 0x03);
+    cpu.mmc.store(0x202, 0x02);
+    cpu.mmc.store(0x203, 0x01);
 
     cpu.setCarryFlag();
     cpu.registers.PC = 0x200;
@@ -2738,7 +2738,7 @@ QUnit.test("ROR a", function (assert) {
 
 QUnit.test("RTI", function (assert) {
 
-    mmc.store(0x200, 0x40);
+    cpu.mmc.store(0x200, 0x40);
 
     cpu.registers.PC = 0x200;
 
@@ -2764,7 +2764,7 @@ QUnit.test("RTI", function (assert) {
 
 QUnit.test("RTS", function (assert) {
 
-    mmc.store(0x200, 0x60);
+    cpu.mmc.store(0x200, 0x60);
 
     cpu.registers.PC = 0x200;
 
@@ -2780,8 +2780,8 @@ QUnit.test("RTS", function (assert) {
 
 QUnit.test("SBC #", function (assert) {
 
-    mmc.store(0x200, 0xE9);
-    mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x200, 0xE9);
+    cpu.mmc.store(0x201, 0x01);
 
     cpu.registers.A = 0x80;
     cpu.registers.PC = 0x200;
@@ -2797,8 +2797,8 @@ QUnit.test("SBC #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE9);
-    mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x200, 0xE9);
+    cpu.mmc.store(0x201, 0x01);
 
     cpu.registers.A = 0x02;
     cpu.registers.PC = 0x200;
@@ -2813,8 +2813,8 @@ QUnit.test("SBC #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE9);
-    mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x200, 0xE9);
+    cpu.mmc.store(0x201, 0x01);
 
     cpu.registers.A = 0x01;
     cpu.registers.PC = 0x200;
@@ -2831,8 +2831,8 @@ QUnit.test("SBC #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE9);
-    mmc.store(0x201, 0x01);
+    cpu.mmc.store(0x200, 0xE9);
+    cpu.mmc.store(0x201, 0x01);
 
     cpu.registers.A = 0x0;
     cpu.registers.PC = 0x200;
@@ -2847,8 +2847,8 @@ QUnit.test("SBC #", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x200, 0xE9);
-    mmc.store(0x201, 0x70);
+    cpu.mmc.store(0x200, 0xE9);
+    cpu.mmc.store(0x201, 0x70);
 
     cpu.registers.A = 0xd0;
     cpu.registers.PC = 0x200;
@@ -2864,7 +2864,7 @@ QUnit.test("SBC #", function (assert) {
 
 QUnit.test("SEC", function (assert) {
 
-    mmc.store(0x200, 0x38);
+    cpu.mmc.store(0x200, 0x38);
     cpu.registers.PC = 0x200;
     cpu.clearCarryFlag();
     var cycles = cpu.execute();
@@ -2877,7 +2877,7 @@ QUnit.test("SEC", function (assert) {
 
 QUnit.test("SED", function (assert) {
 
-    mmc.store(0x200, 0xF8);
+    cpu.mmc.store(0x200, 0xF8);
     cpu.registers.PC = 0x200;
     cpu.clearDecimalFlag();
 
@@ -2889,7 +2889,7 @@ QUnit.test("SED", function (assert) {
 
 QUnit.test("SEI", function (assert) {
 
-    mmc.store(0x200, 0x78);
+    cpu.mmc.store(0x200, 0x78);
     cpu.registers.PC = 0x200;
     cpu.clearInterruptDisableFlag();
 
@@ -2901,9 +2901,9 @@ QUnit.test("SEI", function (assert) {
 
 QUnit.test("STA a", function (assert) {
 
-    mmc.store(0x600, 0x8D);
-    mmc.store(0x601, 0x03);
-    mmc.store(0x602, 0x06);
+    cpu.mmc.store(0x600, 0x8D);
+    cpu.mmc.store(0x601, 0x03);
+    cpu.mmc.store(0x602, 0x06);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x33;
 
@@ -2915,9 +2915,9 @@ QUnit.test("STA a", function (assert) {
 
 QUnit.test("STX a", function (assert) {
 
-    mmc.store(0x600, 0x8E);
-    mmc.store(0x601, 0x03);
-    mmc.store(0x602, 0x06);
+    cpu.mmc.store(0x600, 0x8E);
+    cpu.mmc.store(0x601, 0x03);
+    cpu.mmc.store(0x602, 0x06);
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x33;
 
@@ -2929,9 +2929,9 @@ QUnit.test("STX a", function (assert) {
 
 QUnit.test("STY a", function (assert) {
 
-    mmc.store(0x600, 0x8C);
-    mmc.store(0x601, 0x03);
-    mmc.store(0x602, 0x06);
+    cpu.mmc.store(0x600, 0x8C);
+    cpu.mmc.store(0x601, 0x03);
+    cpu.mmc.store(0x602, 0x06);
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x33;
 
@@ -2943,7 +2943,7 @@ QUnit.test("STY a", function (assert) {
 
 QUnit.test("TAX", function (assert) {
 
-    mmc.store(0x600, 0xAA);
+    cpu.mmc.store(0x600, 0xAA);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x32;
 
@@ -2956,7 +2956,7 @@ QUnit.test("TAX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xAA);
+    cpu.mmc.store(0x600, 0xAA);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x0;
 
@@ -2969,7 +2969,7 @@ QUnit.test("TAX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xAA);
+    cpu.mmc.store(0x600, 0xAA);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x80;
 
@@ -2983,7 +2983,7 @@ QUnit.test("TAX", function (assert) {
 
 QUnit.test("TAY", function (assert) {
 
-    mmc.store(0x600, 0xA8);
+    cpu.mmc.store(0x600, 0xA8);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x32;
 
@@ -2996,7 +2996,7 @@ QUnit.test("TAY", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xA8);
+    cpu.mmc.store(0x600, 0xA8);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x0;
 
@@ -3009,7 +3009,7 @@ QUnit.test("TAY", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xA8);
+    cpu.mmc.store(0x600, 0xA8);
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x80;
 
@@ -3023,7 +3023,7 @@ QUnit.test("TAY", function (assert) {
 
 QUnit.test("TSX", function (assert) {
 
-    mmc.store(0x600, 0xBA);
+    cpu.mmc.store(0x600, 0xBA);
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x32;
 
@@ -3036,7 +3036,7 @@ QUnit.test("TSX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xBA);
+    cpu.mmc.store(0x600, 0xBA);
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x0;
 
@@ -3049,7 +3049,7 @@ QUnit.test("TSX", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0xBA);
+    cpu.mmc.store(0x600, 0xBA);
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x80;
 
@@ -3063,7 +3063,7 @@ QUnit.test("TSX", function (assert) {
 
 QUnit.test("TXA", function (assert) {
 
-    mmc.store(0x600, 0x8A);
+    cpu.mmc.store(0x600, 0x8A);
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x32;
 
@@ -3076,7 +3076,7 @@ QUnit.test("TXA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0x8A);
+    cpu.mmc.store(0x600, 0x8A);
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x0;
 
@@ -3089,7 +3089,7 @@ QUnit.test("TXA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0x8A);
+    cpu.mmc.store(0x600, 0x8A);
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x80;
 
@@ -3103,7 +3103,7 @@ QUnit.test("TXA", function (assert) {
 
 QUnit.test("TXS", function (assert) {
 
-    mmc.store(0x600, 0x9A);
+    cpu.mmc.store(0x600, 0x9A);
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x32;
 
@@ -3116,7 +3116,7 @@ QUnit.test("TXS", function (assert) {
 
 QUnit.test("TYA", function (assert) {
 
-    mmc.store(0x600, 0x98);
+    cpu.mmc.store(0x600, 0x98);
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x32;
 
@@ -3129,7 +3129,7 @@ QUnit.test("TYA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0x98);
+    cpu.mmc.store(0x600, 0x98);
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x0;
 
@@ -3142,7 +3142,7 @@ QUnit.test("TYA", function (assert) {
 
     cpu.reset();
 
-    mmc.store(0x600, 0x98);
+    cpu.mmc.store(0x600, 0x98);
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x80;
 
@@ -3153,3 +3153,72 @@ QUnit.test("TYA", function (assert) {
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y is non zero');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set when Y is negative');
 });
+
+QUnit.module("Assembler", {
+    setup: function () {
+        var mmc = new JNE.MMC();
+        var cpu = new JNE.CPU(mmc);
+        window.assembler = new JNE.Assembler(cpu);
+    },
+    teardown: function () {
+        window.assembler = null;
+    }
+});
+
+QUnit.test("ADC", function (assert) {
+
+    // IMMEDIATE
+    var bytes = assembler.assemble('ADC #$42');
+    var expected = [0x69, 0x42];
+    assert.deepEqual(bytes, expected, 'ADC #$42 assembles');
+
+    // ZERO PAGE
+    bytes = assembler.assemble('ADC $10');
+    expected = [0x65, 0x10];
+    assert.deepEqual(bytes, expected, 'ADC $10 assembles');
+
+    //@todo RELATIVE and ABSOLUTE INDIRECT
+
+    // ABSOLUTE
+    bytes = assembler.assemble('ADC $1020');
+    expected = [0x6D, 0x20, 0x10];
+    assert.deepEqual(bytes, expected, 'ADC $1020 assembles');
+
+    // INDEXED INDIRECT
+    bytes = assembler.assemble('ADC ($10,X)');
+    expected = [0x61, 0x10];
+    assert.deepEqual(bytes, expected, 'ADC ($10,X) assembles');
+
+    // INDIRECT INDEXED
+    bytes = assembler.assemble('ADC ($10),Y');
+    expected = [0x71, 0x10];
+    assert.deepEqual(bytes, expected, 'ADC ($10),Y assembles');
+
+    //IMPLICIT
+    assert.throws(
+        function(){
+            assembler.assemble('ADC');
+        },
+        /Invalid memory address mode for operator/,
+        'Implicit memory address with ADC throws error'
+    );
+
+    //ACCUMULATOR
+    assert.throws(
+        function(){
+            assembler.assemble('ADC A');
+        },
+        /Invalid memory address mode for operator/,
+        'Accumulator memory address with ADC throws error'
+    );
+
+    // INDIRECT (JMP only)
+    assert.throws(
+        function(){
+            assembler.assemble('ADC ($1000)');
+        },
+        /Invalid memory address mode for operator/,
+        'Indirect memory address with ADC throws error'
+    );
+});
+
