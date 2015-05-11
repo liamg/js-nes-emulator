@@ -131,7 +131,7 @@
         this.mmc.store(0x180A, 0xDF);
         this.mmc.store(0x180F, 0xBF);
 
-        for (i = 0x2000; i < this.mmc.length; i++) {
+        for (i = 0x2000; i < this.mmc.size; i++) {
             this.mmc.store(i, 0);
         }
     };
