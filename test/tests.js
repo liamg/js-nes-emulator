@@ -162,7 +162,7 @@ QUnit.module("Clock", {
     }
 });
 
-QUnit.asyncTest("Clock", function(assert){
+QUnit.asyncTest("Clock frequency is within 5% of bare metal (1s)", function(assert){
 
     window.cycleCount = 0;
 
@@ -172,7 +172,7 @@ QUnit.asyncTest("Clock", function(assert){
 
     clock.start();
 
-    var testLength = 2; // seconds
+    var testLength = 1; // seconds
 
     setTimeout(function(){
 
@@ -182,13 +182,36 @@ QUnit.asyncTest("Clock", function(assert){
 
         var cps = window.cycleCount / testLength;
 
-        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds');
+        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds. Result ' + Math.round(((cps/clock.cpuClockSpeed)*100)) + '% of expected');
 
         QUnit.start();
     }, (testLength * 1000));
+});
 
+QUnit.asyncTest("Clock frequency is within 1% of bare metal (10s)", function(assert){
 
+    window.cycleCount = 0;
 
+    clock.onTick(function(cycles){
+        window.cycleCount += cycles;
+    });
+
+    clock.start();
+
+    var testLength = 10; // seconds
+
+    setTimeout(function(){
+
+        clock.stop();
+
+        var marginOfError = 0.01;
+
+        var cps = window.cycleCount / testLength;
+
+        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds. Result ' + Math.round(((cps/clock.cpuClockSpeed)*100)) + '% of expected');
+
+        QUnit.start();
+    }, (testLength * 1000));
 });
 
 QUnit.module("CPU", {
