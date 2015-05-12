@@ -182,8 +182,6 @@ QUnit.asyncTest("Clock", function(assert){
 
         var cps = window.cycleCount / testLength;
 
-        console.log(cps);
-
         assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds');
 
         QUnit.start();
