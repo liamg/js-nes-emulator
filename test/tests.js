@@ -153,7 +153,47 @@ QUnit.test("MMC retrieves values from memory", function (assert) {
 
 });
 
-QUnit.module("6502 CPU", {
+QUnit.module("Clock", {
+    setup: function () {
+        window.clock = new JNE.Clock();
+    },
+    teardown: function () {
+        window.clock = null;
+    }
+});
+
+QUnit.asyncTest("Clock", function(assert){
+
+    window.cycleCount = 0;
+
+    clock.onTick(function(cycles){
+        window.cycleCount += cycles;
+    });
+
+    clock.start();
+
+    var testLength = 2; // seconds
+
+    setTimeout(function(){
+
+        clock.stop();
+
+        var marginOfError = .5;
+
+        var cps = window.cycleCount / testLength;
+
+        console.log(cps);
+
+        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds');
+
+        QUnit.start();
+    }, (testLength * 1000));
+
+
+
+});
+
+QUnit.module("CPU", {
     setup: function () {
         var mmc = new JNE.MMC();
         window.cpu = new JNE.CPU(mmc);

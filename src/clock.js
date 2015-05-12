@@ -7,28 +7,36 @@
 
         this.clockSpeed = 21477272; // Hz (NTSC)
         this.cpuDivisor = 12;
-        this.ppuDivisor = 4;
 
         this.cpuClockSpeed = this.clockSpeed / this.cpuDivisor; // Hz
-        this.ppuClockSpeed = this.clockSpeed / this.ppuDivisor;
         this.tickCallback = function(){};
-        this.kiloTickInterval = 0;
+        this.setTickInterval(10);
     };
 
-    Clock.prototype.onKiloTick = function(callback){
+    /**
+     *
+     * @param tickInterval Tick interval (ms)
+     */
+    Clock.prototype.setTickInterval = function(tickInterval){
+        this.tickInterval = tickInterval;
+        var cyclesPerMicroSecond = (this.cpuClockSpeed / 1000000);
+        this.cpuCyclesPerTick = cyclesPerMicroSecond * (tickInterval * 1000);
+    };
+
+    Clock.prototype.onTick = function(callback){
         this.tickCallback = callback;
     };
 
     Clock.prototype.start = function(){
-        this.kiloTickInterval = setInterval(this.tickCallback, 1);
+        this.tickInterval = setInterval(this.tickCallback, this.tickInterval, this.cpuCyclesPerTick);
     };
 
     Clock.prototype.stop = function(){
-        clearInterval(this.kiloTickInterval);
+        clearInterval(this.tickInterval);
     };
 
     Clock.prototype.reset = function(){
-        clearInterval(this.kiloTickInterval);
+        clearInterval(this.tickInterval);
     };
 
     w.JNE.Clock = Clock;

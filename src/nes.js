@@ -10,7 +10,8 @@
         this.ppu = new JNE.PPU(this.mmc);
         this.clock = new JNE.Clock();
         this.locked = false;
-        this.clock.onKiloTick(this.tick.bind(this));
+        this.clock.onTick(this.tick.bind(this));
+        this.clock.setTickMultiplier(10000); // ticks happen 10,000 times less often than a "real" clock
         this.availableCycles = 0;
     };
 
@@ -18,9 +19,9 @@
 
     };
 
-    NES.prototype.tick = function(){
+    NES.prototype.tick = function(cycles){
 
-        this.availableCycles += (this.clock.cpuClockSpeed * 1000);
+        this.availableCycles += cycles;
 
         if(this.isLocked()){
             return;
