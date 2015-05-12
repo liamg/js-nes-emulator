@@ -162,19 +162,11 @@ QUnit.module("Clock", {
     }
 });
 
-QUnit.asyncTest("Clock frequency is within 5% of bare metal (1s)", function(assert){
+QUnit.asyncTest("Clock frequency is within 5% of bare metal", function(assert){
 
-    window.cycleCount = 0;
+    var testLength = 5; // seconds
 
-    clock.onTick(function(cycles){
-        window.cycleCount += cycles;
-    });
-
-    clock.start();
-
-    var testLength = 1; // seconds
-
-    setTimeout(function(){
+    function endClockTest() {
 
         clock.stop();
 
@@ -182,36 +174,22 @@ QUnit.asyncTest("Clock frequency is within 5% of bare metal (1s)", function(asse
 
         var cps = window.cycleCount / testLength;
 
-        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds. Result ' + Math.round(((cps/clock.cpuClockSpeed)*100)) + '% of expected');
+        assert.ok(cps <= (clock.cpuClockSpeed * (1 + marginOfError)) && cps >= (clock.cpuClockSpeed * (1 - marginOfError)), 'Clock speed falls within acceptable bounds. Result ' + (((cps / clock.cpuClockSpeed) * 100).toFixed(2)) + '% of expected (' + cps + 'Hz)');
 
         QUnit.start();
-    }, (testLength * 1000));
-});
+    }
 
-QUnit.asyncTest("Clock frequency is within 1% of bare metal (10s)", function(assert){
+    function tick(cycles){
+            window.cycleCount += cycles;
+    }
 
     window.cycleCount = 0;
 
-    clock.onTick(function(cycles){
-        window.cycleCount += cycles;
-    });
+    clock.onTick(tick);
 
     clock.start();
 
-    var testLength = 10; // seconds
-
-    setTimeout(function(){
-
-        clock.stop();
-
-        var marginOfError = 0.01;
-
-        var cps = window.cycleCount / testLength;
-
-        assert.ok(cps < (clock.cpuClockSpeed * (1+marginOfError)) && cps > (clock.cpuClockSpeed * (1-marginOfError)), 'Clock speed falls within acceptable bounds. Result ' + Math.round(((cps/clock.cpuClockSpeed)*100)) + '% of expected');
-
-        QUnit.start();
-    }, (testLength * 1000));
+    setTimeout(endClockTest, (testLength * 1000));
 });
 
 QUnit.module("CPU", {

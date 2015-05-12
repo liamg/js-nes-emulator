@@ -10,7 +10,7 @@
 
         this.cpuClockSpeed = this.clockSpeed / this.cpuDivisor; // Hz
         this.tickCallback = function(){};
-        this.setTickInterval(10);
+        this.setTickInterval(20);
     };
 
     /**
@@ -19,8 +19,8 @@
      */
     Clock.prototype.setTickInterval = function(tickInterval){
         this.tickInterval = tickInterval;
-        var cyclesPerMicroSecond = (this.cpuClockSpeed / 1000000);
-        this.cpuCyclesPerTick = cyclesPerMicroSecond * (tickInterval * 1000);
+        var cyclesPerMilliSecond = this.cpuClockSpeed / 1000;
+        this.cpuCyclesPerTick = cyclesPerMilliSecond * tickInterval;
     };
 
     Clock.prototype.onTick = function(callback){
