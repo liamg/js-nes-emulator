@@ -178,7 +178,7 @@ QUnit.asyncTest("Clock", function(assert){
 
         clock.stop();
 
-        var marginOfError = .5;
+        var marginOfError = 0.05;
 
         var cps = window.cycleCount / testLength;
 
