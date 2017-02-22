@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>QUnit tests: js-nes-emulator</title>
     <script src="../src/mmc.js" data-cover></script>
     <script src="../src/cpu.js" data-cover></script>
@@ -8,9 +9,12 @@
     <script src="../src/assembler.js" data-cover></script>
     <script src="../src/clock.js" data-cover></script>
     <script src="../src/nes.js" data-cover></script>
-    <link href="http://code.jquery.com/qunit/qunit-1.14.0.css" media="all" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.14.0.js"></script>
-    <script type="text/javascript" src="tests.js"></script>
+    <link href="../node_modules/qunitjs/qunit/qunit.css" media="all" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../node_modules/qunitjs/qunit/qunit.js"></script>
+    <script type="text/javascript" src="mmc.js"></script>
+    <script type="text/javascript" src="cpu.js"></script>
+    <script type="text/javascript" src="clock.js"></script>
+    <script type="text/javascript" src="assembler.js"></script>
     <script src="../node_modules/blanket/dist/qunit/blanket.min.js"></script>
 </head>
 <body>

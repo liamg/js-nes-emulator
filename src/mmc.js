@@ -10,7 +10,7 @@
  *
  */
 
-(function() {
+(function () {
     "use strict";
 
     window.JNE = window.JNE || {};
@@ -18,7 +18,7 @@
     /**
      * @constructor
      */
-    window.JNE.MMC = function(){
+    window.JNE.MMC = function () {
         this.debug = false;
         this.size = 0x10000; // default to 65536 bytes
         this.memory = new Array(this.size);
@@ -29,8 +29,8 @@
      * Validate an address in memory. Throws an exception if address is invalid.
      * @param address Address in memory to test.
      */
-    window.JNE.MMC.prototype.validateAddress = function(address){
-        if(typeof address !== 'number' || address >= this.size || address < 0){
+    window.JNE.MMC.prototype.validateAddress = function (address) {
+        if (typeof address !== 'number' || address >= this.size || address < 0) {
             throw "Invalid memory address: " + address;
         }
     };
@@ -40,10 +40,10 @@
      * @param address number Address in memory to retrieve value from.
      * @returns number
      */
-    window.JNE.MMC.prototype.fetch = function(address){
+    window.JNE.MMC.prototype.fetch = function (address) {
         this.validateAddress(address);
         //if(this.debug) console.log('Reading address 0x' + address.toString(16) + ' - value is 0x' + this.memory[address].toString(16));
-        return this.memory[address];
+        return this.memory[this.translateAddress(address)];
     };
 
     /**
@@ -51,19 +51,33 @@
      * @param address number Address in memory to store value at.
      * @param value number The value to store.
      */
-    window.JNE.MMC.prototype.store = function(address, value){
+    window.JNE.MMC.prototype.store = function (address, value) {
         this.validateAddress(address);
         //if(this.debug) console.log('Writing value ' + value.toString(16) + ' to address 0x' + address.toString(16));
-        this.memory[address] = value & 255;
+        this.memory[this.translateAddress(address)] = value & 255;
     };
 
     /**
      * Reset the memory to all zeroes.
      */
-    window.JNE.MMC.prototype.reset = function(){
-        for(var i = 0; i < this.memory.length; i++) {
+    window.JNE.MMC.prototype.reset = function () {
+        for (var i = 0; i < this.memory.length; i++) {
             this.memory[i] = 0;
         }
+    };
+
+    /**
+     * Translate an address - used for "mirrored" addresses
+     * @param address
+     * @returns int
+     */
+    window.JNE.MMC.prototype.translateAddress = function (address) {
+        switch (true) {
+            case address >= 0x2008 && address <= 0x3FFF:
+                address = ((address - 0x2000) % 8) + 0x2000;
+                break;
+        }
+        return address;
     };
 
 })();
