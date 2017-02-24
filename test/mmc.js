@@ -153,3 +153,17 @@ QUnit.test("MMC retrieves values from memory", function (assert) {
     );
 
 });
+
+/**
+ * The PPU exposes eight memory-mapped registers to the CPU. These nominally sit at $2000 through $2007 in the CPU's 
+ * address space, but because they're incompletely decoded, they're mirrored in every 8 bytes from $2008 through $3FFF, 
+ * so a write to $3456 is the same as a write to $2006.
+ */
+QUnit.test("MMC translates mirrored memory addresses correctly for the PPU", function (assert) {
+    mmc.store(0x2001, 7);
+    mmc.store(0x2006, 123);
+    assert.equal(mmc.fetch(0x2001), 7);
+    assert.equal(mmc.fetch(0x3451), 7);
+    assert.equal(mmc.fetch(0x2006), 123);
+    assert.equal(mmc.fetch(0x3456), 123);
+});

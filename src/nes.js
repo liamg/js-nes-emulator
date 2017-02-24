@@ -1,4 +1,3 @@
-
 (function (w) {
     "use strict";
 
@@ -15,15 +14,17 @@
         this.availableCycles = 0;
     };
 
-    NES.prototype.loadROM = function(){
+    NES.prototype.loadROM = function () {
 
     };
+    
+    // @todo READ THIS https://wiki.nesdev.com/w/index.php/PPU_rendering
 
-    NES.prototype.tick = function(cycles){
+    NES.prototype.tick = function (cycles) {
 
         this.availableCycles += cycles;
 
-        if(this.isLocked()){
+        if (this.isLocked()) {
             return;
         }
 
@@ -32,50 +33,52 @@
         var cpuCycles = 0;
         var i;
 
-        while(this.availableCycles >= 0){
+        while (this.availableCycles >= 0) {
 
             try {
-                cpuCycles = this.cpu.execute();
-            }catch(e){
+                cpuCycles = this.cpu.emulate();
+            } catch (e) {
                 this.stop();
                 throw e;
             }
 
-            for(i =0; i < cpuCycles * 3; i++){
+            // The NTSC PPU runs at 3 times the CPU clock rate
+            for (i = 0; i < cpuCycles * 3; i++) {
 
                 // PPU operations
+                this.ppu.emulate();
 
             }
 
-            this.availableCycles -= (cpuCycles * 4);
+            this.availableCycles -= cpuCycles;
         }
 
         this.unlock();
     };
 
-    NES.prototype.start = function(){
+    NES.prototype.start = function () {
         this.unlock();
         this.clock.start();
     };
 
-    NES.prototype.stop = function(){
+    NES.prototype.stop = function () {
         this.clock.stop();
         this.unlock();
     };
 
-    NES.prototype.lock = function(){
+    NES.prototype.lock = function () {
         this.locked = true;
     };
 
-    NES.prototype.unlock = function(){
+    NES.prototype.unlock = function () {
         this.locked = false;
     };
 
-    NES.prototype.isLocked = function(){
+    NES.prototype.isLocked = function () {
         return this.locked;
     };
 
-    NES.prototype.reset = function(){
+    NES.prototype.reset = function () {
         this.clock.stop();
         this.cpu.reset();
     };

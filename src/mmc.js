@@ -61,9 +61,9 @@
      * Reset the memory to all zeroes.
      */
     window.JNE.MMC.prototype.reset = function () {
-        for (var i = 0; i < this.memory.length; i++) {
-            this.memory[i] = 0;
-        }
+        var freshMemory = new Array(this.memory.length);
+        freshMemory.fill(0);
+        this.memory = freshMemory;
     };
 
     /**

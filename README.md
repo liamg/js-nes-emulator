@@ -1,12 +1,12 @@
-js-nes-emulator
-===============
+# js-nes-emulator
 
 [![Build Status](https://travis-ci.org/liamg/js-nes-emulator.svg?branch=master)](https://travis-ci.org/liamg/js-nes-emulator) [![Coverage Status](https://coveralls.io/repos/liamg/js-nes-emulator/badge.svg?branch=master)](https://coveralls.io/r/liamg/js-nes-emulator?branch=master)
 
 NES emulator implemented in JavaScript.
 
-Build
------
+Everything is NTSC unless specified.
+
+## Build
 
 [Grunt](http://gruntjs.com) is used to build the project:
 
@@ -15,12 +15,17 @@ Build
 
 You will then find ``js-nes-emulator.min.js`` in ``dist/``.
 
-Test
-----
+## Test
 
 You can run tests with grunt too, via QUnit:
 
     $ grunt test
 
+## Usage
 
+```
+var nes = new JNE.NES();
+nes.loadRom(romData);
+nes.start();
+```
 

@@ -650,7 +650,7 @@
         return this.mmc.fetch(((this.registers.SP + 1) & 0xFF) + 0x100);
     };
 
-    CPU.prototype.execute = function () {
+    CPU.prototype.emulate = function () {
 
         this.memoryCycles = 0;
         this.extraCycles = 0;
