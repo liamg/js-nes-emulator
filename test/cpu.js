@@ -526,7 +526,7 @@ QUnit.test("Invalid opcode check", function (assert) {
 
     assert.throws(
         function () {
-            cpu.execute();
+            cpu.emulate();
         },
         /Invalid opcode/,
         'Error thrown on invalid opcode'
@@ -663,7 +663,7 @@ QUnit.test("ADC #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ADC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x81, '"A" register has value 0x81 stored');
@@ -684,7 +684,7 @@ QUnit.test("ADC #", function (assert) {
 
     cpu.flags.carry = 1;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ADC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored');
@@ -706,7 +706,7 @@ QUnit.test("ADC #", function (assert) {
     cpu.mmc.store(0x202, 0x69); // ADC
     cpu.mmc.store(0x203, 0x00); // #$0
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
     assert.equal(cpu.registers.A, 0x01, '"A" register has value 0x01 stored');
@@ -715,7 +715,7 @@ QUnit.test("ADC #", function (assert) {
     assert.equal(cpu.flags.negative, 0x0, 'Negative flag is not set');
     assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag is not set');
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Additional ADC # call takes 2 further cycles');
     assert.equal(cpu.registers.A, 0x02, '"A" register has value 0x02 stored');
@@ -734,7 +734,7 @@ QUnit.test("ADC #", function (assert) {
     cpu.mmc.store(0x200, 0x69); // ADC
     cpu.mmc.store(0x201, 0x50); // #$ff
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
     assert.equal(cpu.flags.overflow, 0x1, 'Overflow flag is set');
@@ -751,7 +751,7 @@ QUnit.test("ADC #", function (assert) {
     cpu.mmc.store(0x200, 0x69); // ADC
     cpu.mmc.store(0x201, 0x00); // #$2
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ADC # call takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set');
@@ -768,7 +768,7 @@ QUnit.test("AND #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'AND # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
@@ -785,7 +785,7 @@ QUnit.test("AND #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'AND # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored');
@@ -805,7 +805,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ASL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x18, '"A" register has value 0x18 stored');
@@ -824,7 +824,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ASL a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0xE, 'Memory at 0x203 has value 0xE stored');
@@ -841,7 +841,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.registers.A = 0x40;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ASL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored');
@@ -858,7 +858,7 @@ QUnit.test("ASL", function (assert) {
 
     cpu.registers.A = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ASL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x80 stored');
@@ -881,7 +881,7 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BCC r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if carry not clear');
@@ -896,7 +896,7 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BCC r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry not set and multi page');
@@ -911,7 +911,7 @@ QUnit.test("BCC r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BCC r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is clear');
@@ -926,7 +926,7 @@ QUnit.test("BCS r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BCC r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if carry clear');
@@ -943,7 +943,7 @@ QUnit.test("BCS r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BCS r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if carry set and multi page');
@@ -960,7 +960,7 @@ QUnit.test("BCS r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BCS r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if carry is set');
@@ -977,7 +977,7 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BEQ r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if zero clear');
@@ -994,7 +994,7 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BEQ r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if zero set and multi page');
@@ -1011,7 +1011,7 @@ QUnit.test("BEQ r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BEQ r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if zero is set');
@@ -1027,7 +1027,7 @@ QUnit.test("BIT a", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0xff;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'BIT a takes 4 cycles');
     assert.equal(cpu.flags.zero, 0, 'Zero flag is not set when BIT test run on 0xFF & 0xFF');
@@ -1044,7 +1044,7 @@ QUnit.test("BIT a", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0xff;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'BIT a takes 4 cycles');
     assert.equal(cpu.flags.zero, 1, 'Zero flag is set when BIT test run on 0x00 & 0xFF');
@@ -1062,7 +1062,7 @@ QUnit.test("BMI r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BMI r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if negative clear');
@@ -1079,7 +1079,7 @@ QUnit.test("BMI r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BMI r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if negative set and multi page');
@@ -1096,7 +1096,7 @@ QUnit.test("BMI r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BMI r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if negative is set');
@@ -1113,7 +1113,7 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BNE r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if zero set');
@@ -1130,7 +1130,7 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BNE r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if zero not set and multi page');
@@ -1147,7 +1147,7 @@ QUnit.test("BNE r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BNE r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if zero is clear');
@@ -1164,7 +1164,7 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BPL r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if negative set');
@@ -1181,7 +1181,7 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BPL r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if negative clear and multi page');
@@ -1198,7 +1198,7 @@ QUnit.test("BPL r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BPL r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if negative is clear');
@@ -1218,7 +1218,7 @@ QUnit.test("BRK", function (assert) {
 
     var initialPC = cpu.registers.PC + 2;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 7, 'BRK takes 7 cycles');
     assert.equal(cpu.flags.brk, 1, 'BRK flag is set');
@@ -1241,7 +1241,7 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BVC r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if overflow not clear');
@@ -1256,7 +1256,7 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BVC r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if overflow not set and multi page');
@@ -1271,7 +1271,7 @@ QUnit.test("BVC r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BVC r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is clear');
@@ -1286,7 +1286,7 @@ QUnit.test("BVS r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'Unsuccessful BVS r takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'Branch does not jump if overflow clear');
@@ -1303,7 +1303,7 @@ QUnit.test("BVS r", function (assert) {
 
     cpu.registers.PC = 0x2fe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'Successful BVS r takes 4 cycles with new page');
     assert.equal(cpu.registers.PC, 0x301, 'Branch does jump if overflow set and multi page');
@@ -1320,7 +1320,7 @@ QUnit.test("BVS r", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'Successful BVS r takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'Branch jumps if overflow is set');
@@ -1334,7 +1334,7 @@ QUnit.test("CLC", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLC takes 2 cycles');
     assert.equal(cpu.flags.carry, 0x0, 'Set carry flag is cleared on CLC');
@@ -1347,7 +1347,7 @@ QUnit.test("CLC", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLC takes 2 cycles when already clear');
     assert.equal(cpu.flags.carry, 0x0, 'Carry flag stays cleared on CLC');
@@ -1362,7 +1362,7 @@ QUnit.test("CLD", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLD takes 2 cycles');
     assert.equal(cpu.flags.decimal, 0x0, 'Set decimal flag is cleared on CLD');
@@ -1375,7 +1375,7 @@ QUnit.test("CLD", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLD takes 2 cycles when already clear');
     assert.equal(cpu.flags.decimal, 0x0, 'Decimal flag stays cleared on CLD');
@@ -1390,7 +1390,7 @@ QUnit.test("CLI", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLI takes 2 cycles');
     assert.equal(cpu.flags.interruptDisable, 0x0, 'Set interrupt disable flag is cleared on CLI');
@@ -1403,7 +1403,7 @@ QUnit.test("CLI", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLI takes 2 cycles when already clear');
     assert.equal(cpu.flags.interruptDisable, 0x0, 'Interrupt disable flag stays cleared on CLI');
@@ -1418,7 +1418,7 @@ QUnit.test("CLV", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLV takes 2 cycles');
     assert.equal(cpu.flags.overflow, 0x0, 'Set decimal flag is cleared on CLV');
@@ -1431,7 +1431,7 @@ QUnit.test("CLV", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CLV takes 2 cycles when already clear');
     assert.equal(cpu.flags.overflow, 0x0, 'Overflow flag stays cleared on CLV');
@@ -1446,7 +1446,7 @@ QUnit.test("CMP #", function (assert) {
     cpu.registers.A = 0x7;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CMP # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when A==M on CMP');
@@ -1461,7 +1461,7 @@ QUnit.test("CMP #", function (assert) {
     cpu.registers.A = 0x7;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CMP # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A<M on CMP');
@@ -1476,7 +1476,7 @@ QUnit.test("CMP #", function (assert) {
     cpu.registers.A = 0x9;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CMP # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when A>M on CMP');
@@ -1494,7 +1494,7 @@ QUnit.test("CPX #", function (assert) {
     cpu.registers.X = 0x7;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPX # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when X==M on CPX');
@@ -1509,7 +1509,7 @@ QUnit.test("CPX #", function (assert) {
     cpu.registers.X = 0x7;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPX # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X<M on CPX');
@@ -1524,7 +1524,7 @@ QUnit.test("CPX #", function (assert) {
     cpu.registers.X = 0x9;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPX # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when X>M on CPX');
@@ -1542,7 +1542,7 @@ QUnit.test("CPY #", function (assert) {
     cpu.registers.Y = 0x7;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPY # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when Y==M on CPY');
@@ -1557,7 +1557,7 @@ QUnit.test("CPY #", function (assert) {
     cpu.registers.Y = 0x7;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPY # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y<M on CPY');
@@ -1572,7 +1572,7 @@ QUnit.test("CPY #", function (assert) {
     cpu.registers.Y = 0x9;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'CPY # takes 2 cycles');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear when Y>M on CPY');
@@ -1590,7 +1590,7 @@ QUnit.test("DEC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x8, 'DEC a on 0x9 results in 0x8');
@@ -1606,7 +1606,7 @@ QUnit.test("DEC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0xff, 'DEC a on 0x0 results in 0xff');
@@ -1622,7 +1622,7 @@ QUnit.test("DEC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'DEC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0, 'DEC a on 0x1 results in 0x0');
@@ -1638,7 +1638,7 @@ QUnit.test("DEX", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0x01;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'DEX takes 2 cycles');
     assert.equal(cpu.registers.X, 0x0, 'DEX on 0x1 results in 0x0');
@@ -1652,7 +1652,7 @@ QUnit.test("DEX", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0x00;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'DEX takes 2 cycles');
     assert.equal(cpu.registers.X, 0xff, 'DEX on 0x0 results in 0xff (-1)');
@@ -1668,7 +1668,7 @@ QUnit.test("DEY", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0x01;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'DEY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x0, 'DEY on 0x1 results in 0x0');
@@ -1682,7 +1682,7 @@ QUnit.test("DEY", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0x00;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'DEY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0xff, 'DEY on 0x0 results in 0xff (-1)');
@@ -1699,7 +1699,7 @@ QUnit.test("EOR #", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x15;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'EOR # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, 'EOR 0x15 0x15 results in 0x0');
@@ -1716,7 +1716,7 @@ QUnit.test("INC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0a, 'INC a on 0x9 results in 0x0a');
@@ -1732,7 +1732,7 @@ QUnit.test("INC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x81, 'INC a on 0x80 results in 0x81');
@@ -1748,7 +1748,7 @@ QUnit.test("INC a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'INC a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0, 'INC a on 0xff results in 0x0');
@@ -1764,7 +1764,7 @@ QUnit.test("INX", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0xff;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'INX takes 2 cycles');
     assert.equal(cpu.registers.X, 0x0, 'INX on 0xff results in 0x0');
@@ -1778,7 +1778,7 @@ QUnit.test("INX", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.X = 0xfe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'INX takes 2 cycles');
     assert.equal(cpu.registers.X, 0xff, 'INX on 0x0 results is 0xff');
@@ -1794,7 +1794,7 @@ QUnit.test("INY", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0xff;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'INY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x0, 'INY on 0xff results in 0x0');
@@ -1808,7 +1808,7 @@ QUnit.test("INY", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.Y = 0xfe;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'INY takes 2 cycles');
     assert.equal(cpu.registers.Y, 0xff, 'INY on 0x0 results is 0xff');
@@ -1826,7 +1826,7 @@ QUnit.test("JMP a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 3, 'JMP a takes 3 cycles');
     assert.equal(cpu.registers.PC, 0x203, 'JMP results in PC being set to JMP arg');
@@ -1841,7 +1841,7 @@ QUnit.test("JSR a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'JSR a takes 6 cycles');
     assert.equal(cpu.registers.PC, 0x2ff, 'JSR results in PC being set to JMP arg');
@@ -1857,7 +1857,7 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'LDA # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x07, '"A" register has value 0x07 stored');
@@ -1874,13 +1874,13 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.A, 0x08, '"A" register has value 0x08 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDA #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.A, 0x0f, '"A" register has value 0x0f stored');
     assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDA #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.A, 0x00, '"A" register has value 0x00 stored');
     assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDA #');
 
@@ -1892,7 +1892,7 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 1, 'LDA #0 results in zero flag being set');
     assert.equal(cpu.flags.negative, 0, 'LDA #0 results in negative flag being unset');
@@ -1904,7 +1904,7 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDA #7 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 0, 'LDA #7 results in negative flag being unset');
@@ -1916,7 +1916,7 @@ QUnit.test("LDA #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDA #81 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 1, 'LDA #81 results in negative flag being set');
@@ -1930,7 +1930,7 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'LDX # takes 2 cycles');
     assert.equal(cpu.registers.X, 0x07, '"X" register has value 0x07 stored');
@@ -1947,13 +1947,13 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.X, 0x08, '"X" register has value 0x08 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDX #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.X, 0x0f, '"X" register has value 0x0f stored');
     assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDX #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.X, 0x00, '"X" register has value 0x00 stored');
     assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDX #');
 
@@ -1965,7 +1965,7 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 1, 'LDX #0 results in zero flag being set');
     assert.equal(cpu.flags.negative, 0, 'LDX #0 results in negative flag being unset');
@@ -1977,7 +1977,7 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDX #7 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 0, 'LDX #7 results in negative flag being unset');
@@ -1989,7 +1989,7 @@ QUnit.test("LDX #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDX #81 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 1, 'LDX #81 results in negative flag being set');
@@ -2003,7 +2003,7 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'LDY # takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x07, '"A" register has value 0x07 stored');
@@ -2020,13 +2020,13 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.Y, 0x08, '"A" register has value 0x08 stored');
     assert.equal(cpu.registers.PC, 0x202, 'Program counter is incremented twice for LDY #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.Y, 0x0f, '"A" register has value 0x0f stored');
     assert.equal(cpu.registers.PC, 0x204, 'Program counter is incremented twice for LDY #');
-    cpu.execute();
+    cpu.emulate();
     assert.equal(cpu.registers.Y, 0x00, '"A" register has value 0x00 stored');
     assert.equal(cpu.registers.PC, 0x206, 'Program counter is incremented twice for LDY #');
 
@@ -2038,7 +2038,7 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 1, 'LDY #0 results in zero flag being set');
     assert.equal(cpu.flags.negative, 0, 'LDY #0 results in negative flag being unset');
@@ -2050,7 +2050,7 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDY #7 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 0, 'LDY #7 results in negative flag being unset');
@@ -2062,7 +2062,7 @@ QUnit.test("LDY #", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cpu.execute();
+    cpu.emulate();
 
     assert.equal(cpu.flags.zero, 0, 'LDY #81 results in zero flag being unset');
     assert.equal(cpu.flags.negative, 1, 'LDY #81 results in negative flag being set');
@@ -2076,7 +2076,7 @@ QUnit.test("LSR A", function (assert) {
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'LSR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored after LSR of 0x08');
@@ -2091,7 +2091,7 @@ QUnit.test("LSR A", function (assert) {
     cpu.registers.A = 0x01;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'LSR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after LSR of 0x01');
@@ -2110,7 +2110,7 @@ QUnit.test("LSR a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'LSR A takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x04, 'Memory has value 0x04 stored after LSR of 0x08');
@@ -2127,7 +2127,7 @@ QUnit.test("LSR a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'LSR A takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after LSR of 0x01');
@@ -2145,7 +2145,7 @@ QUnit.test("NOP", function (assert) {
     var preState_flags = JSON.stringify(cpu.flags);
     var preState_memory = JSON.stringify(cpu.mmc.memory);
 
-    assert.equal(cpu.execute(), 2, 'NOP takes 2 cycles');
+    assert.equal(cpu.emulate(), 2, 'NOP takes 2 cycles');
     assert.equal(cpu.registers.PC, 0x201, 'PC is incremented once on NOP');
 
     cpu.registers.PC = 0x200;
@@ -2165,7 +2165,7 @@ QUnit.test("ORA #", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x40; // 01000000
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ORA # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x55, 'ORA 0x15 0x15 results in 0x55');
@@ -2180,7 +2180,7 @@ QUnit.test("ORA #", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x00; // 00000000
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ORA # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, 'ORA 0x0 0x0 results in 0x0');
@@ -2195,7 +2195,7 @@ QUnit.test("ORA #", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x01; // 00000001
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ORA # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x81, 'ORA 0x80 0x01 results in 0x81');
@@ -2209,7 +2209,7 @@ QUnit.test("PHA", function (assert) {
     cpu.mmc.store(0x200, 0x48);
     cpu.registers.PC = 0x200;
     cpu.registers.A = 0x88;
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
     assert.equal(cycles, 3, 'PHA takes 3 cycles');
     assert.equal(cpu.pop(), 0x88, 'PHA pushes value of A to stack');
 });
@@ -2218,7 +2218,7 @@ QUnit.test("PHP", function (assert) {
 
     cpu.mmc.store(0x200, 0x08);
     cpu.registers.PC = 0x200;
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
     assert.equal(cycles, 3, 'PHP takes 3 cycles');
     assert.equal(cpu.pop(), cpu.registers.P, 'PHP pushes value of P to stack');
 });
@@ -2228,7 +2228,7 @@ QUnit.test("PLA", function (assert) {
     cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x77);
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
     assert.equal(cycles, 4, 'PLA takes 4 cycles');
     assert.equal(cpu.registers.A, 0x77, 'PLA pulls value stack pop into A');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after PLA where stack value is non zero');
@@ -2239,7 +2239,7 @@ QUnit.test("PLA", function (assert) {
     cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x0);
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
     assert.equal(cycles, 4, 'PLA takes 4 cycles');
     assert.equal(cpu.registers.A, 0x0, 'PLA pulls value stack pop into A');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set after PLA where stack value is zero');
@@ -2250,7 +2250,7 @@ QUnit.test("PLA", function (assert) {
     cpu.mmc.store(0x200, 0x68);
     cpu.registers.PC = 0x200;
     cpu.push(0x80);
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
     assert.equal(cycles, 4, 'PLA takes 4 cycles');
     assert.equal(cpu.registers.A, 0x80, 'PLA pulls value stack pop into A');
     assert.equal(cpu.flags.zero, 0x0, 'Zero flag is clear after PLA where stack value is non zero');
@@ -2263,7 +2263,7 @@ QUnit.test("PLP", function (assert) {
     cpu.mmc.store(0x200, 0x28);
     cpu.registers.PC = 0x200;
     cpu.push(0xff);
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
     assert.equal(cycles, 4, 'PLP takes 4 cycles');
     assert.equal(cpu.registers.P, 0xff, 'PLP pulls value stack pop into P');
     assert.equal(cpu.flags.zero, 0x1, 'Zero flag is set when PLP pulls 0xff from stack');
@@ -2284,7 +2284,7 @@ QUnit.test("ROL A", function (assert) {
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x10, '"A" register has value 0x10 stored after ROL of 0x08');
@@ -2299,7 +2299,7 @@ QUnit.test("ROL A", function (assert) {
     cpu.registers.A = 0x80;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after ROL of 0x80');
@@ -2314,7 +2314,7 @@ QUnit.test("ROL A", function (assert) {
     cpu.registers.A = 0x40;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored after ROL of 0x40');
@@ -2330,7 +2330,7 @@ QUnit.test("ROL A", function (assert) {
     cpu.registers.A = 0x0;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROL A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x01, '"A" register has value 0x01 stored after ROL of 0x0 with carry set');
@@ -2348,7 +2348,7 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROL a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x10, 'Memory has value 0x10 stored after ROL of 0x08');
@@ -2365,7 +2365,7 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROL a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0, 'Memory has value 0x0 stored after ROL of 0x80');
@@ -2382,7 +2382,7 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROL a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x80, 'Memory has value 0x80 stored after ROL of 0x40');
@@ -2401,7 +2401,7 @@ QUnit.test("ROL a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROL a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x01, 'Memory has value 0x01 stored after ROL of 0x0 with carry set');
@@ -2417,7 +2417,7 @@ QUnit.test("ROR A", function (assert) {
     cpu.registers.A = 0x08;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x04, '"A" register has value 0x04 stored after ROR of 0x08');
@@ -2432,7 +2432,7 @@ QUnit.test("ROR A", function (assert) {
     cpu.registers.A = 0x1;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after ROR of 0x1');
@@ -2448,7 +2448,7 @@ QUnit.test("ROR A", function (assert) {
     cpu.registers.A = 0x2;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x81, '"A" register has value 0x81 stored after ROR of 0x2 with carry set');
@@ -2464,7 +2464,7 @@ QUnit.test("ROR A", function (assert) {
     cpu.registers.A = 0x1;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'ROR A takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, '"A" register has value 0x80 stored after ROR of 0x1 with carry set');
@@ -2482,7 +2482,7 @@ QUnit.test("ROR a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROR a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x04, '"A" register has value 0x04 stored after ROR of 0x08');
@@ -2499,7 +2499,7 @@ QUnit.test("ROR a", function (assert) {
 
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROR a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x0, '"A" register has value 0x0 stored after ROR of 0x1');
@@ -2517,7 +2517,7 @@ QUnit.test("ROR a", function (assert) {
     cpu.setCarryFlag();
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROR a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x81, '"A" register has value 0x81 stored after ROR of 0x2 with carry set');
@@ -2535,7 +2535,7 @@ QUnit.test("ROR a", function (assert) {
     cpu.setCarryFlag();
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'ROR a takes 6 cycles');
     assert.equal(cpu.mmc.fetch(0x203), 0x80, '"A" register has value 0x80 stored after ROR of 0x1 with carry set');
@@ -2554,7 +2554,7 @@ QUnit.test("RTI", function (assert) {
     cpu.push(0x02); //...address
     cpu.push(0xff); //flags
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'RTI takes 6 cycles');
     assert.equal(cpu.flags.negative, 0x1, 'Negative flag is set after RTI with 0xff stacked last');
@@ -2579,7 +2579,7 @@ QUnit.test("RTS", function (assert) {
     cpu.push(0x04); //return...
     cpu.push(0x02); //...address
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 6, 'RTS takes 6 cycles');
     assert.equal(cpu.registers.PC, 0x204, 'PC is set to 0x204 after RTS with 0x04 then 0x02 stacked');
@@ -2594,7 +2594,7 @@ QUnit.test("SBC #", function (assert) {
     cpu.registers.A = 0x80;
     cpu.registers.PC = 0x200;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SBC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x7E, '"A" register has value 0x7E stored after SBC 0x80 - 0x01');
@@ -2611,7 +2611,7 @@ QUnit.test("SBC #", function (assert) {
     cpu.registers.A = 0x02;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SBC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after SBC 0x02 - 0x01');
@@ -2629,7 +2629,7 @@ QUnit.test("SBC #", function (assert) {
 
     cpu.setCarryFlag();
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SBC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, '"A" register has value 0x0 stored after SBC 0x01 - 0x01 with carry flag set');
@@ -2645,7 +2645,7 @@ QUnit.test("SBC #", function (assert) {
     cpu.registers.A = 0x0;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SBC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0xfe, '"A" register has value 0xfe stored after SBC 0x0 - 0x01');
@@ -2661,7 +2661,7 @@ QUnit.test("SBC #", function (assert) {
     cpu.registers.A = 0xd0;
     cpu.registers.PC = 0x200;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SBC # takes 2 cycles');
     assert.equal(cpu.registers.A, 0x5f, '"A" register has value 0x5f stored after SBC 0xd0 - 0x70');
@@ -2675,7 +2675,7 @@ QUnit.test("SEC", function (assert) {
     cpu.mmc.store(0x200, 0x38);
     cpu.registers.PC = 0x200;
     cpu.clearCarryFlag();
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
 
 
@@ -2689,7 +2689,7 @@ QUnit.test("SED", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.clearDecimalFlag();
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SED takes 2 cycles');
     assert.equal(cpu.flags.decimal, 0x1, 'SED sets decimal flag');
@@ -2701,7 +2701,7 @@ QUnit.test("SEI", function (assert) {
     cpu.registers.PC = 0x200;
     cpu.clearInterruptDisableFlag();
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'SEI takes 2 cycles');
     assert.equal(cpu.flags.interruptDisable, 0x1, 'SEI sets IRQ flag');
@@ -2715,7 +2715,7 @@ QUnit.test("STA a", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x33;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'STA a takes 4 cycles');
     assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STA a stores value of A in memory');
@@ -2729,7 +2729,7 @@ QUnit.test("STX a", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x33;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'STX a takes 4 cycles');
     assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STX a stores value of X in memory');
@@ -2743,7 +2743,7 @@ QUnit.test("STY a", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x33;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 4, 'STY a takes 4 cycles');
     assert.equal(cpu.mmc.fetch(0x603), 0x33, 'STY a stores value of Y in memory');
@@ -2755,7 +2755,7 @@ QUnit.test("TAX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x32, 'TAX transfers A into X');
@@ -2768,7 +2768,7 @@ QUnit.test("TAX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x0;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x0, 'TAX transfers A into X');
@@ -2781,7 +2781,7 @@ QUnit.test("TAX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x80, 'TAX transfers A into X');
@@ -2795,7 +2795,7 @@ QUnit.test("TAY", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAY a takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x32, 'TAY transfers A into Y');
@@ -2808,7 +2808,7 @@ QUnit.test("TAY", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x0;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAY a takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x0, 'TAY transfers A into Y');
@@ -2821,7 +2821,7 @@ QUnit.test("TAY", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.A = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAY a takes 2 cycles');
     assert.equal(cpu.registers.Y, 0x80, 'TAY transfers A into Y');
@@ -2835,7 +2835,7 @@ QUnit.test("TSX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x32, 'TAX transfers SP into X');
@@ -2848,7 +2848,7 @@ QUnit.test("TSX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x0;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x0, 'TAX transfers SP into X');
@@ -2861,7 +2861,7 @@ QUnit.test("TSX", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.SP = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TAX a takes 2 cycles');
     assert.equal(cpu.registers.X, 0x80, 'TAX transfers SP into X');
@@ -2875,7 +2875,7 @@ QUnit.test("TXA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TXA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x32, 'TXA transfers X into A');
@@ -2888,7 +2888,7 @@ QUnit.test("TXA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x0;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TXA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, 'TXA transfers X into A');
@@ -2901,7 +2901,7 @@ QUnit.test("TXA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TXA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, 'TXA transfers X into A');
@@ -2915,7 +2915,7 @@ QUnit.test("TXS", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.X = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TXS a takes 2 cycles');
     assert.equal(cpu.registers.SP, 0x32, 'TXS transfers X into SP');
@@ -2928,7 +2928,7 @@ QUnit.test("TYA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x32;
 
-    var cycles = cpu.execute();
+    var cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TYA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x32, 'TYA transfers Y into A');
@@ -2941,7 +2941,7 @@ QUnit.test("TYA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x0;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TYA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x0, 'TYA transfers Y into A');
@@ -2954,7 +2954,7 @@ QUnit.test("TYA", function (assert) {
     cpu.registers.PC = 0x600;
     cpu.registers.Y = 0x80;
 
-    cycles = cpu.execute();
+    cycles = cpu.emulate();
 
     assert.equal(cycles, 2, 'TYA a takes 2 cycles');
     assert.equal(cpu.registers.A, 0x80, 'TYA transfers Y into A');
